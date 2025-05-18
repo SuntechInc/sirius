@@ -35,25 +35,23 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Cria usuário não-root
+# Cria usuário não‐root
 RUN addgroup --system --gid 1001 nodejs \
  && adduser --system --uid 1001 nextjs
 
-# Copia o standalone output do Next 15 e estáticos
+# Copia o standalone output do Next e estáticos
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static    ./.next/static
-# Copia o diretório public apenas se ele existir
-RUN mkdir -p public && \
-    if [ -d "/app/public" ]; then \
-      cp -r /app/public/* ./public/; \
-    fi
+
+# Copia o diretório public (se existir) com o mesmo proprietário
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 USER nextjs
 
 EXPOSE 3000
 ENV PORT=3000 HOST=0.0.0.0
 
-# Healthcheck interno do Docker (e que bate com as probes K8s)
+# Healthcheck interno do Docker (alinha com probes K8s)
 HEALTHCHECK --interval=30s --timeout=2s --start-period=10s --retries=3 \
   CMD wget -q --spider http://localhost:3000/api/healthz || exit 1
 

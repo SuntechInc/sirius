@@ -1,6 +1,6 @@
 # syntax=docker.io/docker/dockerfile:1
 
-### 1) Stage "deps": só instala deps
+### 1) Stage "deps"
 FROM node:22.15.1-alpine3.20 AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
@@ -15,7 +15,7 @@ RUN if [ -f yarn.lock ]; then \
       echo "Lockfile not found." && exit 1; \
     fi
 
-### 2) Stage "builder": builda o Next.js
+### 2) Stage "builder"
 FROM node:22.15.1-alpine3.20 AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
@@ -29,34 +29,33 @@ RUN if [ -f yarn.lock ]; then \
       corepack enable pnpm && pnpm run build; \
     fi
 
-### 3) Stage "runner": roda apenas o built + saúde
+### 3) Stage "runner"
 FROM node:22.15.1-alpine3.20 AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Cria usuário não‐root
+# Cria usuário não-root
 RUN addgroup --system --gid 1001 nodejs \
  && adduser --system --uid 1001 nextjs
 
-# Copia o standalone output do Next e estáticos
+# Copia o standalone e estáticos
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static    ./.next/static
 
-# Copia o diretório public de forma segura (não quebra se vazio ou ausente)
+# Copia de forma segura todo conteúdo de public/, se existir
 USER root
-RUN mkdir -p public \
- && if [ -d "/app/public" ]; then \
-      cp -r /app/public/. ./public; \
-    fi
+RUN mkdir -p public && \
+    for file in /app/public/*; do \
+      [ -e "$file" ] && cp -r "$file" public/; \
+    done
 USER nextjs
 
 EXPOSE 3000
 ENV PORT=3000 HOST=0.0.0.0
 
-# Healthcheck interno do Docker (alinha com probes K8s)
+# Healthcheck interno do Docker
 HEALTHCHECK --interval=30s --timeout=2s --start-period=10s --retries=3 \
   CMD wget -q --spider http://localhost:3000/api/healthz || exit 1
 
-# Inicia o servidor standalone gerado pelo Next
 CMD ["node", "server.js"]

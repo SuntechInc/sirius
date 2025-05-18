@@ -52,7 +52,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            export KUBECONFIG=/home/devops/.kube/config
+            export KUBECONFIG=/home/ci-deploy/.kube/config
 
             # Update the image on the Deployment to the new 'latest' tag
             kubectl set image deployment/frontend-prod \

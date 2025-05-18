@@ -54,9 +54,13 @@ jobs:
           script: |
             export KUBECONFIG=/home/ci-deploy/.kube/config
 
-            # Update the image on the Deployment to the new 'latest' tag
+            # Inject environment values
+            IMAGE_NAME="${{ env.IMAGE_NAME }}"
+            TAG="latest"
+
+            # Update the Deployment image to the proper tag
             kubectl set image deployment/frontend-prod \
-              frontend=$IMAGE_NAME:latest \
+              frontend=${IMAGE_NAME}:${TAG} \
               -n frontend-prod \
               --record
 

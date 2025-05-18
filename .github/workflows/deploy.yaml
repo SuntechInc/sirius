@@ -15,62 +15,61 @@ jobs:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
     outputs:
-      tag: ${{ steps.set-tag.outputs.TAG }}
+      image: ${{ steps.build.outputs.image }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Determine Docker tag
-        id: set-tag
+      - name: Determine Docker tag (short SHA)
+        id: tag
         run: |
-          if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
-            echo "TAG=latest" >> $GITHUB_ENV
-          else
-            echo "TAG=develop" >> $GITHUB_ENV
-          fi
-          echo "::set-output name=TAG::$TAG"
+          # pega os primeiros 7 caracteres do SHA
+          SHORT_SHA=${GITHUB_SHA::7}
+          echo "TAG=$SHORT_SHA" >> $GITHUB_ENV
+          echo "::set-output name=TAG::$SHORT_SHA"
 
       - name: Log in to Docker Hub
-        run: echo "${{ secrets.DOCKER_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+        run: echo "${{ secrets.DOCKER_ACCESS_TOKEN }}" \
+              | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Build Docker image
-        run: docker build -t $IMAGE_NAME:${{ env.TAG }} .
+        id: build
+        run: |
+          docker build -t $IMAGE_NAME:${{ steps.tag.outputs.TAG }} .
+          echo "::set-output name=image::$IMAGE_NAME:${{ steps.tag.outputs.TAG }}"
 
       - name: Push Docker image
-        run: docker push $IMAGE_NAME:${{ env.TAG }}
+        run: docker push $IMAGE_NAME:${{ steps.tag.outputs.TAG }}
 
   deploy-to-k8s:
-    name: Deploy to Kubernetes (Production)
+    name: Deploy to Kubernetes
     needs: build-and-push
-    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: SSH & kubectl rollout
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
+          username: ci-deploy
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             export KUBECONFIG=/home/ci-deploy/.kube/config
 
-            # Inject environment values
-            IMAGE_NAME="${{ env.IMAGE_NAME }}"
-            TAG="latest"
+            IMAGE=${{ needs.build-and-push.outputs.image }}
 
-            # Update the Deployment image to the proper tag
+            # Atualiza o Deployment com a nova tag de SHA
             kubectl set image deployment/frontend-prod \
-              frontend=${IMAGE_NAME}:${TAG} \
+              frontend=$IMAGE \
               -n frontend-prod \
               --record
 
-            # Ensure the pod always pulls the fresh image
+            # Garante que sempre puxe do registry (PullPolicy=Always)
             kubectl patch deployment frontend-prod \
               -n frontend-prod \
               --type='json' \
               -p='[{"op":"replace","path":"/spec/template/spec/containers/0/imagePullPolicy","value":"Always"}]'
 
-            # Wait for zero-downtime rollout (maxSurge=1, maxUnavailable=0)
+            # Espera o rollout terminar sem downtime
             kubectl rollout status deployment/frontend-prod \
               -n frontend-prod \
               --timeout=120s

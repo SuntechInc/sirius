@@ -1,3 +1,4 @@
+# .github/workflows/deploy.yaml
 name: Deploy Sirius
 
 on:
@@ -11,37 +12,40 @@ env:
 
 jobs:
   build-and-push:
+    name: Build & Push Docker Image
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.set-tag.outputs.TAG }}
     steps:
-      - name: Checkout do Código
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Login no Docker Hub
+      - name: Determine Docker tag
+        id: set-tag
+        run: |
+          if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
+            echo "TAG=latest" >> $GITHUB_ENV
+          else
+            echo "TAG=develop" >> $GITHUB_ENV
+          fi
+          echo "::set-output name=TAG::$TAG"
+
+      - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      - name: Build da Imagem Docker
-        run: |
-          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            TAG="latest"
-          else
-            TAG="develop"
-          fi
-          docker build -t $IMAGE_NAME:$TAG .
+      - name: Build Docker image
+        run: docker build -t $IMAGE_NAME:${{ env.TAG }} .
 
-      - name: Push da Imagem
-        run: |
-          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            TAG="latest"
-          else
-            TAG="develop"
-          fi
-          docker push $IMAGE_NAME:$TAG
+      - name: Push Docker image
+        run: docker push $IMAGE_NAME:${{ env.TAG }}
 
   deploy-to-k8s:
+    name: Deploy to Kubernetes (Production)
     needs: build-and-push
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - name: Conectar na VPS e aplicar rollout
+      - name: SSH & kubectl rollout
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -50,8 +54,19 @@ jobs:
           script: |
             export KUBECONFIG=/home/devops/.kube/config
 
-            if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-              kubectl rollout restart deployment sirius -n sirius-prod
-            else
-              kubectl rollout restart deployment sirius-homolog -n sirius-homolog
-            fi
+            # Update the image on the Deployment to the new 'latest' tag
+            kubectl set image deployment/frontend-prod \
+              frontend=$IMAGE_NAME:latest \
+              -n frontend-prod \
+              --record
+
+            # Ensure the pod always pulls the fresh image
+            kubectl patch deployment frontend-prod \
+              -n frontend-prod \
+              --type='json' \
+              -p='[{"op":"replace","path":"/spec/template/spec/containers/0/imagePullPolicy","value":"Always"}]'
+
+            # Wait for zero-downtime rollout (maxSurge=1, maxUnavailable=0)
+            kubectl rollout status deployment/frontend-prod \
+              -n frontend-prod \
+              --timeout=120s

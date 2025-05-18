@@ -1,6 +1,6 @@
 # syntax=docker.io/docker/dockerfile:1
 
-### 1) Stage “deps”: só instala deps
+### 1) Stage "deps": só instala deps
 FROM node:22.15.1-alpine3.20 AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
@@ -15,7 +15,7 @@ RUN if [ -f yarn.lock ]; then \
       echo "Lockfile not found." && exit 1; \
     fi
 
-### 2) Stage “builder”: builda o Next.js
+### 2) Stage "builder": builda o Next.js
 FROM node:22.15.1-alpine3.20 AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
@@ -29,7 +29,7 @@ RUN if [ -f yarn.lock ]; then \
       corepack enable pnpm && pnpm run build; \
     fi
 
-### 3) Stage “runner”: roda apenas o built + saúde
+### 3) Stage "runner": roda apenas o built + saúde
 FROM node:22.15.1-alpine3.20 AS runner
 WORKDIR /app
 ENV NODE_ENV=production
@@ -42,7 +42,11 @@ RUN addgroup --system --gid 1001 nodejs \
 # Copia o standalone output do Next 15 e estáticos
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static    ./.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/public         ./public
+# Copia o diretório public apenas se ele existir
+RUN mkdir -p public && \
+    if [ -d "/app/public" ]; then \
+      cp -r /app/public/* ./public/; \
+    fi
 
 USER nextjs
 

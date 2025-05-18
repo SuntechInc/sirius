@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - develop
+  workflow_dispatch:
 
 env:
   IMAGE_NAME: lucassuntech/sirius
@@ -23,30 +24,32 @@ jobs:
       - name: Determine Docker tag (short SHA)
         id: tag
         run: |
-          # pega os primeiros 7 caracteres do SHA
-          SHORT_SHA=${GITHUB_SHA::7}
-          echo "TAG=$SHORT_SHA" >> $GITHUB_ENV
-          echo "::set-output name=TAG::$SHORT_SHA"
+          echo "TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
+          echo "::set-output name=TAG::${GITHUB_SHA::7}"
 
       - name: Log in to Docker Hub
-        run: echo "${{ secrets.DOCKER_ACCESS_TOKEN }}" \
-              | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+        run: |
+          echo "${{ secrets.DOCKER_ACCESS_TOKEN }}" \
+            | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Build Docker image
         id: build
         run: |
-          docker build -t $IMAGE_NAME:${{ steps.tag.outputs.TAG }} .
-          echo "::set-output name=image::$IMAGE_NAME:${{ steps.tag.outputs.TAG }}"
+          IMAGE="${IMAGE_NAME}:${{ steps.tag.outputs.TAG }}"
+          docker build -t $IMAGE .
+          echo "::set-output name=image::$IMAGE"
 
       - name: Push Docker image
-        run: docker push $IMAGE_NAME:${{ steps.tag.outputs.TAG }}
+        run: |
+          docker push "${{ steps.build.outputs.image }}"
 
   deploy-to-k8s:
     name: Deploy to Kubernetes
     needs: build-and-push
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     steps:
-      - name: SSH & kubectl rollout
+      - name: SSH & kubectl deploy
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -55,21 +58,24 @@ jobs:
           script: |
             export KUBECONFIG=/home/ci-deploy/.kube/config
 
-            IMAGE=${{ needs.build-and-push.outputs.image }}
+            # Recebe a imagem gerada no build
+            IMAGE="${{ needs.build-and-push.outputs.image }}"
 
-            # Atualiza o Deployment com a nova tag de SHA
+            echo "Deploying image: $IMAGE"
+
+            # Atualiza o Deployment com a nova tag SHA
             kubectl set image deployment/frontend-prod \
-              frontend=$IMAGE \
+              frontend="$IMAGE" \
               -n frontend-prod \
               --record
 
-            # Garante que sempre puxe do registry (PullPolicy=Always)
+            # Garante PullPolicy=Always
             kubectl patch deployment frontend-prod \
               -n frontend-prod \
-              --type='json' \
+              --type=json \
               -p='[{"op":"replace","path":"/spec/template/spec/containers/0/imagePullPolicy","value":"Always"}]'
 
-            # Espera o rollout terminar sem downtime
+            # Aguarda rollout
             kubectl rollout status deployment/frontend-prod \
               -n frontend-prod \
               --timeout=120s

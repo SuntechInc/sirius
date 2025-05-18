@@ -43,13 +43,13 @@ RUN addgroup --system --gid 1001 nodejs \
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static    ./.next/static
 
-# Copia de forma segura todo conteúdo de public/, se existir
-USER root
-RUN mkdir -p public && \
-    for file in /app/public/*; do \
-      [ -e "$file" ] && cp -r "$file" public/; \
-    done
-USER nextjs
+# Comentado pois não estamos usando arquivos estáticos no momento
+# USER root
+# RUN mkdir -p public && \
+#     for file in /app/public/*; do \
+#       [ -e "$file" ] && cp -r "$file" public/; \
+#     done
+# USER nextjs
 
 EXPOSE 3000
 ENV PORT=3000 HOST=0.0.0.0

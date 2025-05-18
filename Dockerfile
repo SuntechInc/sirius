@@ -43,9 +43,12 @@ RUN addgroup --system --gid 1001 nodejs \
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static    ./.next/static
 
-# Copia o diretório public (se existir) com o mesmo proprietário
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
-
+# Copia o diretório public de forma segura (não quebra se vazio ou ausente)
+USER root
+RUN mkdir -p public \
+ && if [ -d "/app/public" ]; then \
+      cp -r /app/public/. ./public; \
+    fi
 USER nextjs
 
 EXPOSE 3000

@@ -5,42 +5,33 @@ on:
   push:
     branches:
       - main
-      - develop
   workflow_dispatch:
 
 env:
   IMAGE_NAME: lucassuntech/sirius
-  K8S_NAMESPACE: frontend-prod
-  K8S_DEPLOYMENT: frontend-prod
 
 jobs:
   build-and-push:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Determine Docker tag (short SHA)
-        id: tag
         run: echo "TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
       - name: Log in to Docker Hub
-        run: echo "${{ secrets.DOCKER_ACCESS_TOKEN }}" \
-          | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+        run: |
+          echo "${{ secrets.DOCKER_ACCESS_TOKEN }}" \
+            | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      - name: Build Docker image
+      - name: Build & Push Docker images
         run: |
           IMAGE="${IMAGE_NAME}:${TAG}"
           docker build -t $IMAGE .
           docker tag $IMAGE $IMAGE_NAME:latest
-
-      - name: Push Docker images
-        run: |
-          # push SHA-tagged
-          docker push "${IMAGE_NAME}:${TAG}"
-          # push latest
-          docker push "${IMAGE_NAME}:latest"
+          docker push "$IMAGE"
+          docker push "$IMAGE_NAME:latest"
 
   deploy-to-k8s:
     name: Deploy to Kubernetes (Production)
@@ -57,10 +48,16 @@ jobs:
           script: |
             export KUBECONFIG=/home/ci-deploy/.kube/config
 
-            # Reinicia o Deployment para puxar imagem:latest
-            kubectl rollout restart deployment/${K8S_DEPLOYMENT} -n ${K8S_NAMESPACE}
+            # namespace e deployment hardcoded para evitar expansão vazia
+            NAMESPACE=frontend-prod
+            DEPLOYMENT=frontend-prod
 
-            # Aguarda o rollout completar
-            kubectl rollout status deployment/${K8S_DEPLOYMENT} \
-              -n ${K8S_NAMESPACE} \
+            echo "Restarting $DEPLOYMENT in namespace $NAMESPACE to pull :latest…"
+
+            # reinicia o rollout, puxando sempre a imagem :latest
+            kubectl rollout restart deployment/${DEPLOYMENT} -n ${NAMESPACE}
+
+            # aguarda a nova versão entrar em Ready
+            kubectl rollout status deployment/${DEPLOYMENT} \
+              -n ${NAMESPACE} \
               --timeout=120s

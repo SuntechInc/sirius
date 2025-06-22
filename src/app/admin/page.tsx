@@ -1,6 +1,6 @@
-// src/pages/admin/index.tsx
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
+"use client";
+import { useEffect, useState, FormEvent } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function AdminHome() {
   const router = useRouter()

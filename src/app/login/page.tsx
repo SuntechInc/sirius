@@ -1,6 +1,6 @@
-// src/pages/login.tsx
+"use client";
 import { useState, FormEvent } from 'react'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -41,7 +41,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 space-y-6">
         <h1 className="text-3xl font-extrabold text-gray-900 text-center">
-          Entrar no Sirius
+          Bem vindo ao Quality Flow 
         </h1>
 
         {error && (

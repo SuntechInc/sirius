@@ -8,12 +8,14 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
 
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setError(null)
 
     try {
-      const res = await fetch('/bff/login', {
+      const res = await fetch(`${apiUrl}/auth/login`, {
         method: 'POST',
         credentials: 'include', // Envia cookies HttpOnly
         headers: { 'Content-Type': 'application/json' },

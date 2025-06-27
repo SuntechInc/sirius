@@ -1,6 +1,7 @@
-"use client";
-import { useEffect, useState, FormEvent } from 'react'
+'use client'
 import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { Button } from '@/components/ui/button'
 
 export default function AdminHome() {
   const router = useRouter()
@@ -34,24 +35,24 @@ export default function AdminHome() {
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <header className="max-w-4xl mx-auto mb-8">
-        <h1 className="text-2xl font-bold text-gray-800">Área Administrativa</h1>
+        <h1 className="text-2xl font-bold text-gray-800">
+          Área Administrativa
+        </h1>
       </header>
 
       <main className="max-w-4xl mx-auto space-y-4">
         <p className="text-gray-700">Selecione uma empresa para gerenciar:</p>
         <div className="grid gap-4 sm:grid-cols-2">
           {companies.map(companyId => (
-            <button
+            <Button
               key={companyId}
-              onClick={() =>
-                router.push(`/admin/company/${companyId}`)
-              }
+              onClick={() => router.push(`/admin/company/${companyId}`)}
               className="w-full text-left bg-white rounded-xl shadow hover:shadow-md p-4 transition"
             >
               <h2 className="text-lg font-semibold text-gray-800">
                 Empresa: {companyId}
               </h2>
-            </button>
+            </Button>
           ))}
         </div>
       </main>

@@ -100,12 +100,12 @@ export default function AdminDashboard() {
   }
 
   const getPlanoBadge = (plano: string) => {
-    const variants = {
+    const variants: Record<string, "default" | "destructive" | "outline" | "secondary"> = {
       "Básico": "secondary",
       "Premium": "default",
       "Enterprise": "destructive",
     }
-    return <Badge variant={variants[plano as keyof typeof variants] || "secondary"}>{plano}</Badge>
+    return <Badge variant={variants[plano] || "secondary"}>{plano}</Badge>
   }
 
   return (

@@ -18,9 +18,13 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
   const publicRoute = publicRoutes.find(route => route.path === path)
 
-  const session = await getSession()
+  const { token } = await getSession()
 
-  if (!session.token && publicRoute) {
+  if (!token && publicRoute) {
+    return NextResponse.next()
+  }
+
+  if (!token && !publicRoute) {
     const redirectUrl = request.nextUrl.clone()
 
     redirectUrl.pathname = REDIRECT_WHEN_NOT_AUTHENTICATED_ROUTE
@@ -28,19 +32,15 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl)
   }
 
-  if (
-    session.token &&
-    publicRoute &&
-    publicRoute.whenAuthenticated === 'redirect'
-  ) {
+  if (token && publicRoute && publicRoute.whenAuthenticated === 'redirect') {
     const redirectUrl = request.nextUrl.clone()
 
-    redirectUrl.pathname = '/dashboard'
+    redirectUrl.pathname = '/'
 
     return NextResponse.redirect(redirectUrl)
   }
 
-  if (session.token && !publicRoute) {
+  if (token && !publicRoute) {
     // Verificar se o JWT tá expirado
     //  se sim, remover o cookie e redirecionar o usuário para /login
 

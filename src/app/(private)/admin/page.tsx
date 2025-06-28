@@ -6,19 +6,19 @@ import { Button } from '@/components/ui/button'
 export default function AdminHome() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
-  const [companies, setCompanies] = useState<string[]>([])
+  const [companyId, setCompanyId] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/bff/users/profile', {
+    fetch('/api/auth/me', {
       credentials: 'include',
     })
       .then(async res => {
         if (!res.ok) throw new Error('Não autenticado')
         const data = await res.json()
-        if (data.type !== 'GLOBAL_ADMIN') {
+        if (data.userType !== 'GLOBAL_ADMIN') {
           return router.replace('/dashboard')
         }
-        setCompanies(data.companies || [])
+        setCompanyId(data.companyId)
         setLoading(false)
       })
       .catch(() => router.replace('/login'))
@@ -41,19 +41,16 @@ export default function AdminHome() {
       </header>
 
       <main className="max-w-4xl mx-auto space-y-4">
-        <p className="text-gray-700">Selecione uma empresa para gerenciar:</p>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {companies.map(companyId => (
-            <Button
-              key={companyId}
-              onClick={() => router.push(`/admin/company/${companyId}`)}
-              className="w-full text-left bg-white rounded-xl shadow hover:shadow-md p-4 transition"
-            >
-              <h2 className="text-lg font-semibold text-gray-800">
-                Empresa: {companyId}
-              </h2>
-            </Button>
-          ))}
+        <p className="text-gray-700">Gerenciar empresa:</p>
+        <div className="grid gap-4 sm:grid-cols-1">
+          <Button
+            onClick={() => router.push(`/admin/company/${companyId}`)}
+            className="w-full text-left bg-white rounded-xl shadow hover:shadow-md p-4 transition"
+          >
+            <h2 className="text-lg font-semibold text-gray-800">
+              Empresa: {companyId}
+            </h2>
+          </Button>
         </div>
       </main>
     </div>

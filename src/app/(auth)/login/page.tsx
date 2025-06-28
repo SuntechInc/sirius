@@ -15,9 +15,9 @@ export default function LoginPage() {
         <div className="flex flex-col gap-6">
           <Card>
             <CardHeader className="text-center">
-              <CardTitle className="text-xl">Welcome back</CardTitle>
+              <CardTitle className="text-xl">Bem vindo ao Quality Flow</CardTitle>
               <CardDescription>
-                Login with your Apple or Google account
+                Entre com seu email e senha empresarial
               </CardDescription>
             </CardHeader>
             <CardContent>

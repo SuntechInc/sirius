@@ -12,7 +12,7 @@ export default function TokenTest() {
       setCarregando(true);
       setErro("");
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin-only`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/admin-only`, {
           credentials: "include",
         });
         if (!res.ok) throw new Error("Acesso negado ou token inválido");

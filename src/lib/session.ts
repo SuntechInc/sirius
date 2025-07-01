@@ -20,8 +20,9 @@ export async function getSession() {
     ttl,
     cookieOptions: {
       httpOnly: true,
-      secure: false, // set this to false in local (non-HTTPS) development
-      sameSite: 'lax', // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite#lax
+      secure: true, // obrigatório para produção/HTTPS
+      sameSite: 'none', // obrigatório para cross-site
+      domain: '.qualityflow.com.br', // permite uso em todos os subdomínios
       maxAge: (ttl === 0 ? 2147483647 : ttl) - 60, // Expire cookie before the session expires.
       path: '/',
     },

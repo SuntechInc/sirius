@@ -1,25 +1,19 @@
+import jwt from 'jsonwebtoken'
 import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/session'
-import jwt from 'jsonwebtoken'
 
 export async function GET() {
   try {
     const session = await getSession()
-    
+
     if (!session.token) {
-      return NextResponse.json(
-        { error: 'Não autenticado' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
     }
 
-    const decoded = jwt.decode(session.token) as any
-    
+    const decoded = jwt.decode(session.token)
+
     if (!decoded) {
-      return NextResponse.json(
-        { error: 'Token inválido' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Token inválido' }, { status: 401 })
     }
 
     return NextResponse.json({
@@ -29,7 +23,7 @@ export async function GET() {
       userId: decoded.sub,
       email: decoded.email,
       // todo anothers filds
-      ...decoded
+      ...decoded,
     })
   } catch (error) {
     console.error('Erro ao obter informações do usuário:', error)
@@ -38,4 +32,4 @@ export async function GET() {
       { status: 500 }
     )
   }
-} 
+}

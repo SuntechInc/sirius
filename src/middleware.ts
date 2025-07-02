@@ -1,5 +1,7 @@
+import jwt from 'jsonwebtoken'
 import { type NextRequest, NextResponse } from 'next/server'
-import { getSession } from './lib/session'
+import { getSession, type User } from './lib/session'
+import { UserType } from './types/enums'
 
 const publicRoutes = [
   {
@@ -40,11 +42,21 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl)
   }
 
-  if (token && !publicRoute) {
-    // Verificar se o JWT tá expirado
-    //  se sim, remover o cookie e redirecionar o usuário para /login
+  const user = jwt.decode(token) as unknown as User
 
-    return NextResponse.next()
+  if (user.userType === UserType.GLOBAL_ADMIN) {
+    if (path !== '/' && !path.startsWith('/admin')) {
+      const redirectUrl = request.nextUrl.clone()
+      redirectUrl.pathname = '/admin'
+      return NextResponse.redirect(redirectUrl)
+    }
+  } else {
+    // Redirect non-admins away from /admin area
+    if (path.startsWith('/admin')) {
+      const redirectUrl = request.nextUrl.clone()
+      redirectUrl.pathname = '/dashboard'
+      return NextResponse.redirect(redirectUrl)
+    }
   }
 
   return NextResponse.next()

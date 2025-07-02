@@ -1,5 +1,9 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useTransition } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { PasswordInput } from '@/components/password-input'
 import { Button } from '@/components/ui/button'
 import {
@@ -13,10 +17,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { loginAction } from '@/lib/actions/login'
 import { type AuthSchema, authSchema } from '@/lib/validations/auth'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useTransition } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
 
 export function LoginForm() {
   const [isPending, startTransition] = useTransition()

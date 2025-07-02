@@ -1,10 +1,10 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import type { Company } from '@/types/company'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
+import type { Company } from '@/types/company'
 import { CompanyModal } from './company-modal'
 import { CompanyTable } from './company-table'
 

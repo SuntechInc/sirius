@@ -1,10 +1,12 @@
 'use server'
 
+import { UserType } from '@/types/enums'
 import { Effect } from 'effect'
+import jwt from 'jsonwebtoken'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { ApiServiceLive } from '../api.effect'
-import { saveSession } from '../session'
+import { saveSession, type User } from '../session'
 import type { AuthSchema } from '../validations/auth'
 import { loginEffect } from './login.effect'
 
@@ -53,6 +55,12 @@ export async function loginAction(input: AuthSchema) {
   )
 
   if (result.success) {
+    const { userType } = jwt.decode(result.data.accessToken) as unknown as User
+
+    if (userType === UserType.GLOBAL_ADMIN) {
+      redirect('/admin')
+    }
+
     redirect('/dashboard')
   }
 

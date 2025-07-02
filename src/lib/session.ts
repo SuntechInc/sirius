@@ -22,7 +22,10 @@ export async function getSession() {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // só HTTPS em produção
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // ajuste para desenvolvimento
-      domain: process.env.NODE_ENV === 'production' ? '.qualityflow.com.br' : undefined, // só em produção
+      domain:
+        process.env.NODE_ENV === 'production'
+          ? '.qualityflow.com.br'
+          : undefined, // só em produção
       maxAge: (ttl === 0 ? 2147483647 : ttl) - 60, // Expire cookie before the session expires.
       path: '/',
     },

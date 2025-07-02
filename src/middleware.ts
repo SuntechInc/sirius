@@ -18,48 +18,36 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
   const publicRoute = publicRoutes.find(route => route.path === path)
 
-  try {
-    const { token } = await getSession()
+  const { token } = await getSession()
 
-    // Log para debug (remover em produção)
-    console.log(`[Middleware] Path: ${path}, Token: ${token ? 'present' : 'missing'}`)
-
-    if (!token && publicRoute) {
-      return NextResponse.next()
-    }
-
-    if (!token && !publicRoute) {
-      const redirectUrl = request.nextUrl.clone()
-      redirectUrl.pathname = REDIRECT_WHEN_NOT_AUTHENTICATED_ROUTE
-      return NextResponse.redirect(redirectUrl)
-    }
-
-    if (token && publicRoute && publicRoute.whenAuthenticated === 'redirect') {
-      const redirectUrl = request.nextUrl.clone()
-      redirectUrl.pathname = '/dashboard'
-      return NextResponse.redirect(redirectUrl)
-    }
-
-    if (token && !publicRoute) {
-      // Verificar se o JWT tá expirado
-      //  se sim, remover o cookie e redirecionar o usuário para /login
-      return NextResponse.next()
-    }
-
+  if (!token && publicRoute) {
     return NextResponse.next()
-  } catch (error) {
-    console.error('[Middleware] Error:', error)
-    
-    // Em caso de erro, permitir acesso às rotas públicas
-    if (publicRoute) {
-      return NextResponse.next()
-    }
-    
-    // Para rotas privadas, redirecionar para login
+  }
+
+  if (!token && !publicRoute) {
     const redirectUrl = request.nextUrl.clone()
+
     redirectUrl.pathname = REDIRECT_WHEN_NOT_AUTHENTICATED_ROUTE
+
     return NextResponse.redirect(redirectUrl)
   }
+
+  if (token && publicRoute && publicRoute.whenAuthenticated === 'redirect') {
+    const redirectUrl = request.nextUrl.clone()
+
+    redirectUrl.pathname = '/dashboard'
+
+    return NextResponse.redirect(redirectUrl)
+  }
+
+  if (token && !publicRoute) {
+    // Verificar se o JWT tá expirado
+    //  se sim, remover o cookie e redirecionar o usuário para /login
+
+    return NextResponse.next()
+  }
+
+  return NextResponse.next()
 }
 
 export const config = {

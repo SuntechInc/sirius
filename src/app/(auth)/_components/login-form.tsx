@@ -11,17 +11,15 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { login } from '@/lib/actions/login'
+import { loginAction } from '@/lib/actions/login'
 import { type AuthSchema, authSchema } from '@/lib/validations/auth'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useTransition } from 'react'
 import { useForm } from 'react-hook-form'
-import { useState } from 'react'
 import { toast } from 'sonner'
 
 export function LoginForm() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  
+  const [isPending, startTransition] = useTransition()
   const form = useForm<AuthSchema>({
     resolver: zodResolver(authSchema),
     defaultValues: {
@@ -31,18 +29,13 @@ export function LoginForm() {
   })
 
   async function onSubmit(data: AuthSchema) {
-    setIsLoading(true)
-    setError(null)
-    
-    try {
-      await login(data)
-    } catch (error: any) {
-      console.error('Erro no login:', error)
-      setError(error.message || 'Erro ao fazer login')
-      toast.error(error.message || 'Erro ao fazer login')
-    } finally {
-      setIsLoading(false)
-    }
+    startTransition(async () => {
+      const result = await loginAction(data)
+
+      if (!result.success) {
+        toast.error(result.error)
+      }
+    })
   }
 
   return (
@@ -51,12 +44,6 @@ export function LoginForm() {
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col gap-6"
       >
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
-            {error}
-          </div>
-        )}
-        
         <FormField
           control={form.control}
           name="email"
@@ -64,10 +51,10 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>E-mail</FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="email@exemplo.com" 
-                  {...field} 
-                  disabled={isLoading}
+                <Input
+                  disabled={isPending}
+                  placeholder="email@exemplo.com"
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
@@ -81,22 +68,18 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Senha</FormLabel>
               <FormControl>
-                <PasswordInput 
-                  placeholder="********" 
-                  {...field} 
-                  disabled={isLoading}
+                <PasswordInput
+                  disabled={isPending}
+                  placeholder="********"
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button 
-          type="submit" 
-          className="cursor-pointer"
-          disabled={isLoading}
-        >
-          {isLoading ? 'Entrando...' : 'Entrar'}
+        <Button disabled={isPending} type="submit" className="cursor-pointer">
+          {isPending ? 'Entrando...' : 'Entrar'}
         </Button>
       </form>
     </Form>

@@ -1,10 +1,8 @@
-import type { UserType } from './enums'
-
 export interface Tenant {
   id: string
   name: string
   adminEmail: string
-  status: 'ativa' | 'suspensa' | 'pendente'
+  status: string
   plan: string
   employeeCount: number
   createdAt: string
@@ -15,6 +13,6 @@ export interface SystemUser {
   name: string
   email: string
   company: string
-  accessLevel: UserType
+  accessLevel: string
   lastLogin: string
 }

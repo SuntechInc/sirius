@@ -9,7 +9,7 @@ import {
   UserCheck,
   Users,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import {
   AlertDialog,
@@ -43,52 +43,15 @@ import {
 } from '@/components/ui/table'
 import { useImpersonation } from '@/hooks/use-impersonation'
 import type { Tenant } from '@/types/admin'
+import { CompanyStatus } from '@/types/admin'
 import { ImpersonationConfirmationModal } from './impersonation-confirmation-modal'
 import { OnboardTenantModal } from './onboard-tenant-modal'
-
-// Dados mock para demonstração
-const mockTenants: Tenant[] = [
-  {
-    id: '1',
-    name: 'TechCorp Solutions',
-    adminEmail: 'admin@techcorp.com',
-    status: 'ativa',
-    plan: 'Enterprise',
-    employeeCount: 1247,
-    createdAt: '2023-01-15',
-  },
-  {
-    id: '2',
-    name: 'Indústria MetalMax',
-    adminEmail: 'admin@metalmax.com.br',
-    status: 'ativa',
-    plan: 'Pro',
-    employeeCount: 856,
-    createdAt: '2023-03-22',
-  },
-  {
-    id: '3',
-    name: 'StartupXYZ',
-    adminEmail: 'ceo@startupxyz.com',
-    status: 'pendente',
-    plan: 'Básico',
-    employeeCount: 12,
-    createdAt: '2024-12-01',
-  },
-  {
-    id: '4',
-    name: 'Comércio ABC Ltda',
-    adminEmail: 'admin@comercioabc.com',
-    status: 'suspensa',
-    plan: 'Pro',
-    employeeCount: 234,
-    createdAt: '2022-08-10',
-  },
-]
+import { api } from '@/lib/api'
 
 export function TenantManagement() {
-  const [tenants, setTenants] = useState<Tenant[]>(mockTenants)
-  const [isLoading, setIsLoading] = useState(false)
+  const [tenants, setTenants] = useState<Tenant[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [isOnboardModalOpen, setIsOnboardModalOpen] = useState(false)
   const [confirmationText, setConfirmationText] = useState('')
   const { startImpersonation } = useImpersonation()
@@ -103,22 +66,31 @@ export function TenantManagement() {
     return new Date(dateString).toLocaleDateString('pt-BR')
   }
 
+  function formatCNPJ(cnpj?: string) {
+    if (!cnpj) return '-'
+    return cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5')
+  }
+
   const getStatusBadge = (status: string) => {
-    const variants = {
-      ativa: 'bg-green-100 text-green-800',
-      suspensa: 'bg-orange-100 text-orange-800',
-      pendente: 'bg-yellow-100 text-yellow-800',
+    const variants: Record<string, string> = {
+      [CompanyStatus.ACTIVE]: 'bg-green-100 text-green-800',
+      [CompanyStatus.INACTIVE]: 'bg-gray-200 text-gray-700',
+      [CompanyStatus.SUSPENDED]: 'bg-orange-100 text-orange-800',
+      [CompanyStatus.CLOSED]: 'bg-red-100 text-red-800',
+      [CompanyStatus.TRIAL]: 'bg-blue-100 text-blue-800',
+      [CompanyStatus.CANCELLED]: 'bg-red-200 text-red-900',
     }
-
-    const labels = {
-      ativa: 'Ativa',
-      suspensa: 'Suspensa',
-      pendente: 'Pendente',
+    const labels: Record<string, string> = {
+      [CompanyStatus.ACTIVE]: 'Ativa',
+      [CompanyStatus.INACTIVE]: 'Inativa',
+      [CompanyStatus.SUSPENDED]: 'Suspensa',
+      [CompanyStatus.CLOSED]: 'Encerrada',
+      [CompanyStatus.TRIAL]: 'Trial',
+      [CompanyStatus.CANCELLED]: 'Cancelada',
     }
-
     return (
-      <Badge className={variants[status as keyof typeof variants]}>
-        {labels[status as keyof typeof labels]}
+      <Badge className={variants[status] || 'bg-gray-100 text-gray-800'}>
+        {labels[status] || status}
       </Badge>
     )
   }
@@ -129,7 +101,7 @@ export function TenantManagement() {
 
     setTenants(prev =>
       prev.map(tenant =>
-        tenant.id === tenantId ? { ...tenant, status: 'suspensa' } : tenant
+        tenant.id === tenantId ? { ...tenant, status: CompanyStatus.SUSPENDED } : tenant
       )
     )
 
@@ -168,14 +140,30 @@ export function TenantManagement() {
     if (impersonationTenant) {
       startImpersonation(impersonationTenant)
       toast('Impersonação iniciada', {
-        description: `Você está agora acessando como ${impersonationTenant.name}.`,
+        description: `Você está agora acessando como ${impersonationTenant.tradingName}.`,
       })
     }
     setIsImpersonationModalOpen(false)
     setImpersonationTenant(null)
   }
 
-  if (isLoading && tenants.length === 0) {
+  useEffect(() => {
+    async function fetchTenants() {
+      setIsLoading(true)
+      setError(null)
+      try {
+        const response = await api.get('/companies')
+        setTenants(response.data.data)
+      } catch (err: any) {
+        setError(err.message || 'Erro desconhecido')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchTenants()
+  }, [])
+
+  if (isLoading) {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
@@ -228,6 +216,12 @@ export function TenantManagement() {
     )
   }
 
+  if (error) {
+    return (
+      <div className="text-red-600 p-4">Erro ao carregar empresas: {error}</div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -248,10 +242,10 @@ export function TenantManagement() {
           <TableHeader>
             <TableRow>
               <TableHead>Empresa</TableHead>
-              <TableHead>Admin Principal</TableHead>
-              <TableHead>Status da Conta</TableHead>
+              <TableHead>CNPJ</TableHead>
+              <TableHead>Status da Empresa</TableHead>
               <TableHead>Plano</TableHead>
-              <TableHead>Nº de Funcionários</TableHead>
+              <TableHead>Email</TableHead>
               <TableHead>Data de Cadastro</TableHead>
               <TableHead className="w-[100px]">Ações</TableHead>
             </TableRow>
@@ -259,11 +253,16 @@ export function TenantManagement() {
           <TableBody>
             {tenants.map(tenant => (
               <TableRow key={tenant.id}>
-                <TableCell className="font-medium">{tenant.name}</TableCell>
-                <TableCell>{tenant.adminEmail}</TableCell>
+                <TableCell>
+                  <div>
+                    <div className="font-medium">{(tenant as any).tradingName}</div>
+                    <div className="text-xs text-gray-500">{(tenant as any).legalName}</div>
+                  </div>
+                </TableCell>
+                <TableCell>{formatCNPJ(tenant.taxId)}</TableCell>
                 <TableCell>{getStatusBadge(tenant.status)}</TableCell>
                 <TableCell>{tenant.plan}</TableCell>
-                <TableCell>{tenant.employeeCount.toLocaleString()}</TableCell>
+                <TableCell>{tenant.email}</TableCell>
                 <TableCell>{formatDate(tenant.createdAt)}</TableCell>
                 <TableCell>
                   <DropdownMenu>
@@ -310,7 +309,7 @@ export function TenantManagement() {
                             </AlertDialogTitle>
                             <AlertDialogDescription>
                               Esta ação é irreversível. Todos os dados da
-                              empresa "{tenant.name}" serão permanentemente
+                              empresa "{tenant.tradingName}" serão permanentemente
                               excluídos.
                               <br />
                               <br />
@@ -327,7 +326,7 @@ export function TenantManagement() {
                               onChange={e =>
                                 setConfirmationText(e.target.value)
                               }
-                              placeholder={tenant.name}
+                              placeholder={tenant.tradingName}
                             />
                           </div>
                           <AlertDialogFooter>
@@ -338,10 +337,10 @@ export function TenantManagement() {
                             </AlertDialogCancel>
                             <AlertDialogAction
                               onClick={() =>
-                                handleDeleteTenant(tenant.id, tenant.name)
+                                handleDeleteTenant(tenant.id, tenant.tradingName)
                               }
                               className="bg-red-600 hover:bg-red-700"
-                              disabled={confirmationText !== tenant.name}
+                              disabled={confirmationText !== tenant.tradingName}
                             >
                               Excluir Permanentemente
                             </AlertDialogAction>
@@ -365,7 +364,7 @@ export function TenantManagement() {
             ...tenantData,
             id: Date.now().toString(),
             createdAt: new Date().toISOString().split('T')[0],
-            employeeCount: 0,
+            status: CompanyStatus.ACTIVE,
           }
           setTenants(prev => [...prev, newTenant])
           setIsOnboardModalOpen(false)

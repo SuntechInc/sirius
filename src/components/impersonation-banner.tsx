@@ -25,7 +25,7 @@ export function ImpersonationBanner() {
   const handleAccessCompanyPanel = () => {
     // This would typically navigate to the company's admin panel
     toast('Redirecionando', {
-      description: `Acessando o painel administrativo de ${impersonatedTenant.name}...`,
+      description: `Acessando o painel administrativo de ${impersonatedTenant.tradingName}...`,
     })
   }
 
@@ -41,10 +41,10 @@ export function ImpersonationBanner() {
             variant="outline"
             className="bg-orange-100 text-orange-800 border-orange-300"
           >
-            {impersonatedTenant.name}
+            {impersonatedTenant.tradingName}
           </Badge>
           <span className="text-sm text-orange-700">
-            ({impersonatedTenant.adminEmail})
+            ({impersonatedTenant.email})
           </span>
         </div>
 

@@ -23,8 +23,13 @@ interface OnboardTenantModalProps {
   isOpen: boolean
   onClose: () => void
   onSave: (tenantData: {
-    name: string
-    adminEmail: string
+    tradingName: string
+    legalName: string
+    taxId: string
+    taxCountry: string
+    email: string
+    industry: string
+    segment: string
     status: string
     plan: string
   }) => void
@@ -36,9 +41,14 @@ export function OnboardTenantModal({
   onSave,
 }: OnboardTenantModalProps) {
   const [formData, setFormData] = useState({
-    name: '',
-    adminEmail: '',
-    status: 'pendente',
+    tradingName: '',
+    legalName: '',
+    taxId: '',
+    taxCountry: '',
+    email: '',
+    industry: '',
+    segment: '',
+    status: 'ACTIVE',
     plan: 'Básico',
   })
 
@@ -46,72 +56,114 @@ export function OnboardTenantModal({
     e.preventDefault()
     onSave(formData)
     setFormData({
-      name: '',
-      adminEmail: '',
-      status: 'pendente',
+      tradingName: '',
+      legalName: '',
+      taxId: '',
+      taxCountry: '',
+      email: '',
+      industry: '',
+      segment: '',
+      status: 'ACTIVE',
       plan: 'Básico',
     })
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Onboard Nova Empresa</DialogTitle>
         </DialogHeader>
-
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Nome da Empresa</Label>
+            <Label htmlFor="tradingName">Nome Fantasia</Label>
             <Input
-              id="name"
-              value={formData.name}
-              onChange={e =>
-                setFormData(prev => ({ ...prev, name: e.target.value }))
-              }
+              id="tradingName"
+              value={formData.tradingName}
+              onChange={e => setFormData(prev => ({ ...prev, tradingName: e.target.value }))}
               required
             />
           </div>
-
           <div className="space-y-2">
-            <Label htmlFor="adminEmail">Email do Admin Principal</Label>
+            <Label htmlFor="legalName">Razão Social</Label>
             <Input
-              id="adminEmail"
-              type="email"
-              value={formData.adminEmail}
-              onChange={e =>
-                setFormData(prev => ({ ...prev, adminEmail: e.target.value }))
-              }
+              id="legalName"
+              value={formData.legalName}
+              onChange={e => setFormData(prev => ({ ...prev, legalName: e.target.value }))}
               required
             />
           </div>
-
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="status">Status Inicial</Label>
+              <Label htmlFor="taxId">CNPJ</Label>
+              <Input
+                id="taxId"
+                value={formData.taxId}
+                onChange={e => setFormData(prev => ({ ...prev, taxId: e.target.value }))}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="taxCountry">País do CNPJ</Label>
+              <Input
+                id="taxCountry"
+                value={formData.taxCountry}
+                onChange={e => setFormData(prev => ({ ...prev, taxCountry: e.target.value }))}
+                required
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email">E-mail</Label>
+            <Input
+              id="email"
+              type="email"
+              value={formData.email}
+              onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))}
+              required
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="industry">Indústria</Label>
+              <Input
+                id="industry"
+                value={formData.industry}
+                onChange={e => setFormData(prev => ({ ...prev, industry: e.target.value }))}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="segment">Segmento</Label>
+              <Input
+                id="segment"
+                value={formData.segment}
+                onChange={e => setFormData(prev => ({ ...prev, segment: e.target.value }))}
+                required
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="status">Status</Label>
               <Select
                 value={formData.status}
-                onValueChange={value =>
-                  setFormData(prev => ({ ...prev, status: value }))
-                }
+                onValueChange={value => setFormData(prev => ({ ...prev, status: value }))}
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="pendente">Pendente</SelectItem>
-                  <SelectItem value="ativa">Ativa</SelectItem>
+                  <SelectItem value="ACTIVE">Ativa</SelectItem>
+                  <SelectItem value="TRIAL">Trial</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="plan">Plano</Label>
               <Select
                 value={formData.plan}
-                onValueChange={value =>
-                  setFormData(prev => ({ ...prev, plan: value }))
-                }
+                onValueChange={value => setFormData(prev => ({ ...prev, plan: value }))}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -124,7 +176,6 @@ export function OnboardTenantModal({
               </Select>
             </div>
           </div>
-
           <div className="flex justify-end space-x-2 pt-4">
             <Button type="button" variant="ghost" onClick={onClose}>
               Cancelar

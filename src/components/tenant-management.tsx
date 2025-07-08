@@ -101,7 +101,7 @@ export function TenantManagement() {
 
     setTenants(prev =>
       prev.map(tenant =>
-        tenant.id === tenantId ? { ...tenant, status: 'suspensa' } : tenant
+        tenant.id === tenantId ? { ...tenant, status: CompanyStatus.SUSPENDED } : tenant
       )
     )
 
@@ -140,7 +140,7 @@ export function TenantManagement() {
     if (impersonationTenant) {
       startImpersonation(impersonationTenant)
       toast('Impersonação iniciada', {
-        description: `Você está agora acessando como ${impersonationTenant.name}.`,
+        description: `Você está agora acessando como ${impersonationTenant.tradingName}.`,
       })
     }
     setIsImpersonationModalOpen(false)
@@ -309,7 +309,7 @@ export function TenantManagement() {
                             </AlertDialogTitle>
                             <AlertDialogDescription>
                               Esta ação é irreversível. Todos os dados da
-                              empresa "{tenant.name}" serão permanentemente
+                              empresa "{tenant.tradingName}" serão permanentemente
                               excluídos.
                               <br />
                               <br />
@@ -326,7 +326,7 @@ export function TenantManagement() {
                               onChange={e =>
                                 setConfirmationText(e.target.value)
                               }
-                              placeholder={tenant.name}
+                              placeholder={tenant.tradingName}
                             />
                           </div>
                           <AlertDialogFooter>
@@ -337,10 +337,10 @@ export function TenantManagement() {
                             </AlertDialogCancel>
                             <AlertDialogAction
                               onClick={() =>
-                                handleDeleteTenant(tenant.id, tenant.name)
+                                handleDeleteTenant(tenant.id, tenant.tradingName)
                               }
                               className="bg-red-600 hover:bg-red-700"
-                              disabled={confirmationText !== tenant.name}
+                              disabled={confirmationText !== tenant.tradingName}
                             >
                               Excluir Permanentemente
                             </AlertDialogAction>
@@ -364,7 +364,7 @@ export function TenantManagement() {
             ...tenantData,
             id: Date.now().toString(),
             createdAt: new Date().toISOString().split('T')[0],
-            employeeCount: 0,
+            status: CompanyStatus.ACTIVE,
           }
           setTenants(prev => [...prev, newTenant])
           setIsOnboardModalOpen(false)

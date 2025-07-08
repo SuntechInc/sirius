@@ -12,7 +12,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Badge } from '@/components/ui/badge'
-import type { Tenant } from '@/types/admin'
+import { CompanyStatus, type Tenant } from '@/types/admin'
 
 interface ImpersonationConfirmationModalProps {
   isOpen: boolean
@@ -48,27 +48,27 @@ export function ImpersonationConfirmationModal({
 
             <div className="space-y-2">
               <div className="text-sm">
-                <span className="font-medium">Empresa:</span> {tenant.name}
+                <span className="font-medium">Empresa:</span> {tenant.tradingName}
               </div>
               <div className="text-sm">
                 <span className="font-medium">Admin Principal:</span>{' '}
-                {tenant.adminEmail}
+                {tenant.email}
               </div>
               <div className="text-sm flex items-center space-x-2">
                 <span className="font-medium">Status:</span>
                 <Badge
-                  variant={tenant.status === 'ativa' ? 'default' : 'secondary'}
+                  variant={tenant.status === CompanyStatus.ACTIVE ? 'default' : 'secondary'}
                   className={
-                    tenant.status === 'ativa'
+                    tenant.status === CompanyStatus.ACTIVE
                       ? 'bg-green-100 text-green-800'
-                      : tenant.status === 'suspensa'
+                      : tenant.status === CompanyStatus.SUSPENDED
                         ? 'bg-orange-100 text-orange-800'
                         : 'bg-yellow-100 text-yellow-800'
                   }
                 >
-                  {tenant.status === 'ativa'
+                  {tenant.status === CompanyStatus.ACTIVE
                     ? 'Ativa'
-                    : tenant.status === 'suspensa'
+                    : tenant.status === CompanyStatus.SUSPENDED
                       ? 'Suspensa'
                       : 'Pendente'}
                 </Badge>

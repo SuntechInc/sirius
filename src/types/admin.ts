@@ -1,10 +1,26 @@
+
+
+// Enums
+export enum CompanyStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  SUSPENDED = 'SUSPENDED',
+  CLOSED = 'CLOSED',
+  TRIAL = 'TRIAL',
+  CANCELLED = 'CANCELLED',
+}
+
 export interface Tenant {
   id: string
-  name: string
-  adminEmail: string
-  status: string
-  plan: string
-  employeeCount: number
+  tradingName: string
+  legalName: string
+  taxId: string
+  taxCountry?: string
+  email?: string
+  industry?: string
+  segment?: string
+  status: CompanyStatus
+  plan?: string
   createdAt: string
 }
 

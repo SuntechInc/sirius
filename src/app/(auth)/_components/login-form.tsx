@@ -32,7 +32,7 @@ export function LoginForm() {
     startTransition(async () => {
       const result = await loginAction(data)
 
-      if (!result.success) {
+      if (result.error) {
         toast.error(result.error)
       }
     })

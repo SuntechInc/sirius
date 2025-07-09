@@ -1,68 +1,65 @@
 'use server'
 
-import { UserType } from '@/types/enums'
 import { Effect } from 'effect'
-import jwt from 'jsonwebtoken'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { ApiServiceLive } from '../api.effect'
-import { saveSession, type User } from '../session'
-import type { AuthSchema } from '../validations/auth'
-import { loginEffect } from './login.effect'
+import { z } from 'zod'
+import {
+  type AppError,
+  apiClient,
+  createValidationError,
+  getErrorMessage,
+  ParseError,
+} from '@/lib/effect'
+import { saveSession } from '@/lib/session'
+import { type AuthSchema, authSchema } from '@/lib/validations/auth'
 
 export async function loginAction(input: AuthSchema) {
-  const loginWorkflow = Effect.gen(function* (_) {
-    yield* _(Effect.log('Iniciando login action'))
+  const program = Effect.gen(function* () {
+    const validatedData = yield* Effect.try({
+      try: () => authSchema.parse(input),
+      catch: (error): AppError => {
+        if (error instanceof z.ZodError) {
+          return createValidationError(error)
+        }
+        return new ParseError({
+          message: 'Erro na validação dos dados',
+          data: error,
+        })
+      },
+    })
 
-    const startTime = yield* _(Effect.sync(() => Date.now()))
-
-    const authResult = yield* _(loginEffect(input))
-
-    const endTime = yield* _(Effect.sync(() => Date.now()))
-    const duration = endTime - startTime
-
-    yield* _(Effect.log(`Login concluído em ${duration}ms`))
-
-    yield* _(
-      Effect.tryPromise({
-        try: () => saveSession(authResult.accessToken),
-        catch: () => new Error('Falha ao salvar sessão'),
+    const result = yield* apiClient.post(
+      '/auth/login',
+      validatedData,
+      z.object({
+        accessToken: z.string(),
+        refreshToken: z.string(),
+        user: z.object({
+          id: z.string(),
+          email: z.string().email(),
+          name: z.string(),
+        }),
       })
     )
 
-    yield* _(Effect.sync(() => revalidatePath('/dashboard')))
-
-    return authResult
+    return result
   })
 
   const result = await Effect.runPromise(
-    loginWorkflow.pipe(
-      Effect.match({
-        onFailure: error => {
-          console.error('Login failed:', error)
-          return {
-            success: false as const,
-            error: error.message,
-          }
-        },
-        onSuccess: data => ({
-          success: true as const,
-          data,
-        }),
-      }),
-      Effect.provide(ApiServiceLive)
+    Effect.catchAll(program, error =>
+      Effect.succeed({ error: getErrorMessage(error) })
     )
   )
 
-  if (result.success) {
-    const { userType } = jwt.decode(result.data.accessToken) as unknown as User
-
-    if (userType === UserType.GLOBAL_ADMIN) {
-      redirect('/admin')
-    }
-
-    redirect('/dashboard')
+  if ('error' in result) {
+    return { error: result.error }
   }
 
-  return result
+  const { accessToken } = result
+
+  await saveSession(accessToken)
+
+  revalidatePath('/dashboard')
+  redirect('/dashboard')
 }

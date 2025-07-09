@@ -1,17 +1,40 @@
-import { Button } from '@/components/ui/button'
-import { PlusCircle } from 'lucide-react'
+import { ImpersonationBanner } from '@/components/impersonation-banner'
+import { SystemHealth } from '@/components/system-health'
+import { TenantManagement } from '@/components/tenant-management'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { UserAdministration } from '@/components/user-administration'
 
 export default function AdminPage() {
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold text-gray-900">
-          Gerenciar Empresas Clientes
-        </h2>
-        <Button className="bg-blue-600 hover:bg-blue-700">
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Onboard Nova Empresa
-        </Button>
+    <div className="bg-gray-50 p-6">
+      <div className="w-full">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">
+            Painel do Super Administrador
+          </h1>
+          <p className="text-gray-600 mt-2">
+            Gerenciamento global do sistema de RH multi-empresa
+          </p>
+        </div>
+        <ImpersonationBanner />
+        <Tabs defaultValue="tenants" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="tenants">
+              Gestão de Empresas (Tenants)
+            </TabsTrigger>
+            <TabsTrigger value="users">Administração de Usuários</TabsTrigger>
+            <TabsTrigger value="system">Saúde do Sistema</TabsTrigger>
+          </TabsList>
+          <TabsContent value="tenants">
+            <TenantManagement />
+          </TabsContent>
+          <TabsContent value="users">
+            <UserAdministration />
+          </TabsContent>
+          <TabsContent value="system">
+            <SystemHealth />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   )

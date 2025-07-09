@@ -1,39 +1,31 @@
-export const Industry = {
-  tecnologia: 'Tecnologia',
-  industrial: 'Industrial',
-  comercio: 'Comércio',
-  servicos: 'Serviços',
-  saude: 'Saúde',
-  educacao: 'Educação',
-  financeiro: 'Financeiro',
-  agronegocio: 'Agronegócio',
-  construcao: 'Construção',
-  energia: 'Energia',
-} as const
+export enum Industry {
+  HEALTHCORE = 'HEALTHCORE',
+  AGRIBUSINESS = 'AGRIBUSINESS',
+  TRANSPORTATION_MOBILITY = 'TRANSPORTATION_MOBILITY',
+  TECHNOLOGY = 'TECHNOLOGY',
+}
 
-export const Segment = {
-  software: 'Software',
-  hardware: 'Hardware',
-  metalurgia: 'Metalurgia',
-  automotivo: 'Automotivo',
-  alimenticio: 'Alimentício',
-  textil: 'Têxtil',
-  farmaceutico: 'Farmacêutico',
-  hospitalar: 'Hospitalar',
-  ensino_superior: 'Ensino Superior',
-  ensino_basico: 'Ensino Básico',
-  bancario: 'Bancário',
-  seguros: 'Seguros',
-  agricultura: 'Agricultura',
-  pecuaria: 'Pecuária',
-  residencial: 'Residencial',
-  comercial: 'Comercial',
-  solar: 'Solar',
-  eolica: 'Eólica',
-} as const
+export enum CompanyStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  SUSPENDED = 'SUSPENDED',
+  CLOSED = 'CLOSED',
+  TRIAL = 'TRIAL',
+  CANCELLED = 'CANCELLED',
+}
 
 export enum UserType {
   GLOBAL_ADMIN = 'GLOBAL_ADMIN',
   COMPANY_ADMIN = 'COMPANY_ADMIN',
   EMPLOYEE = 'EMPLOYEE',
+}
+
+export enum Segment {
+  LABORATORY = 'LABORATORY',
+  HOSPITAL = 'HOSPITAL',
+  MEDICAL_METALLURGY = 'MEDICAL_METALLURGY',
+  ANIMAL_HEALTH = 'ANIMAL_HEALTH',
+  VEHICLE_INSPECTION = 'VEHICLE_INSPECTION',
+  VEHICLE_REGISTRATION = 'VEHICLE_REGISTRATION',
+  DRIVING_SCHOOL = 'DRIVING_SCHOOL',
 }

@@ -1,5 +1,9 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useTransition } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { PasswordInput } from '@/components/password-input'
 import { Button } from '@/components/ui/button'
 import {
@@ -11,12 +15,11 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { login } from '@/lib/actions/login'
+import { loginAction } from '@/lib/actions/login'
 import { type AuthSchema, authSchema } from '@/lib/validations/auth'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
 
 export function LoginForm() {
+  const [isPending, startTransition] = useTransition()
   const form = useForm<AuthSchema>({
     resolver: zodResolver(authSchema),
     defaultValues: {
@@ -25,8 +28,14 @@ export function LoginForm() {
     },
   })
 
-  function onSubmit(data: AuthSchema) {
-    login(data)
+  async function onSubmit(data: AuthSchema) {
+    startTransition(async () => {
+      const result = await loginAction(data)
+
+      if (result.error) {
+        toast.error(result.error)
+      }
+    })
   }
 
   return (
@@ -42,7 +51,11 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>E-mail</FormLabel>
               <FormControl>
-                <Input placeholder="email@exemplo.com" {...field} />
+                <Input
+                  disabled={isPending}
+                  placeholder="email@exemplo.com"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -55,14 +68,18 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Senha</FormLabel>
               <FormControl>
-                <PasswordInput placeholder="********" {...field} />
+                <PasswordInput
+                  disabled={isPending}
+                  placeholder="********"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" className="cursor-pointer">
-          Entrar
+        <Button disabled={isPending} type="submit" className="cursor-pointer">
+          {isPending ? 'Entrando...' : 'Entrar'}
         </Button>
       </form>
     </Form>

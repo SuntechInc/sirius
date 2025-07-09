@@ -1,5 +1,7 @@
+import jwt from 'jsonwebtoken'
 import { type NextRequest, NextResponse } from 'next/server'
-import { getSession } from './lib/session'
+import { getSession, type User } from './lib/session'
+import { UserType } from './types/enums'
 
 const publicRoutes = [
   {
@@ -18,9 +20,13 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
   const publicRoute = publicRoutes.find(route => route.path === path)
 
-  const session = await getSession()
+  const { token } = await getSession()
 
-  if (!session.token && publicRoute) {
+  if (!token && publicRoute) {
+    return NextResponse.next()
+  }
+
+  if (!token && !publicRoute) {
     const redirectUrl = request.nextUrl.clone()
 
     redirectUrl.pathname = REDIRECT_WHEN_NOT_AUTHENTICATED_ROUTE
@@ -28,11 +34,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl)
   }
 
-  if (
-    session.token &&
-    publicRoute &&
-    publicRoute.whenAuthenticated === 'redirect'
-  ) {
+  if (token && publicRoute && publicRoute.whenAuthenticated === 'redirect') {
     const redirectUrl = request.nextUrl.clone()
 
     redirectUrl.pathname = '/dashboard'
@@ -40,11 +42,21 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl)
   }
 
-  if (session.token && !publicRoute) {
-    // Verificar se o JWT tá expirado
-    //  se sim, remover o cookie e redirecionar o usuário para /login
+  const user = jwt.decode(token) as unknown as User
 
-    return NextResponse.next()
+  if (user.userType === UserType.GLOBAL_ADMIN) {
+    if (path !== '/' && !path.startsWith('/admin')) {
+      const redirectUrl = request.nextUrl.clone()
+      redirectUrl.pathname = '/admin'
+      return NextResponse.redirect(redirectUrl)
+    }
+  } else {
+    // Redirect non-admins away from /admin area
+    if (path.startsWith('/admin')) {
+      const redirectUrl = request.nextUrl.clone()
+      redirectUrl.pathname = '/dashboard'
+      return NextResponse.redirect(redirectUrl)
+    }
   }
 
   return NextResponse.next()

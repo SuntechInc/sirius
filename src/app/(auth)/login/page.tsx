@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import {
   Card,
   CardContent,
@@ -5,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import Link from 'next/link'
 import { LoginForm } from '../_components/login-form'
 
 export default function LoginPage() {
@@ -15,9 +15,11 @@ export default function LoginPage() {
         <div className="flex flex-col gap-6">
           <Card>
             <CardHeader className="text-center">
-              <CardTitle className="text-xl">Welcome back</CardTitle>
+              <CardTitle className="text-xl">
+                Bem vindo ao Quality Flow
+              </CardTitle>
               <CardDescription>
-                Login with your Apple or Google account
+                Entre com seu email e senha empresarial
               </CardDescription>
             </CardHeader>
             <CardContent>

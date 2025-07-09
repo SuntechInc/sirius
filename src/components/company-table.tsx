@@ -1,5 +1,6 @@
 'use client'
 
+import { Edit, MoreHorizontal, Trash2 } from 'lucide-react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,7 +30,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import type { Company } from '@/types/company'
-import { Edit, MoreHorizontal, Trash2 } from 'lucide-react'
 
 interface CompanyTableProps {
   companies: Company[]
@@ -68,7 +68,7 @@ export function CompanyTable({
           </TableHeader>
           <TableBody>
             {Array.from({ length: 5 }).map((_, index) => (
-              <TableRow key={index}>
+              <TableRow key={`skeleton-row-${index}`}>
                 <TableCell>
                   <Skeleton className="h-4 w-[120px]" />
                 </TableCell>

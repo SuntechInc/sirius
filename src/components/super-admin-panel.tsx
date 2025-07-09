@@ -1,10 +1,12 @@
-import { ImpersonationBanner } from '@/components/impersonation-banner'
-import { SystemHealth } from '@/components/system-health'
-import { TenantManagement } from '@/components/tenant-management'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { UserAdministration } from '@/components/user-administration'
+'use client'
 
-export default async function AdminPage() {
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ImpersonationBanner } from './impersonation-banner'
+import { SystemHealth } from './system-health'
+import { TenantManagement } from './tenant-management'
+import { UserAdministration } from './user-administration'
+
+export function SuperAdminPanel() {
   return (
     <div className="bg-gray-50 p-6">
       <div className="w-full">
@@ -16,7 +18,9 @@ export default async function AdminPage() {
             Gerenciamento global do sistema de RH multi-empresa
           </p>
         </div>
+
         <ImpersonationBanner />
+
         <Tabs defaultValue="tenants" className="space-y-6">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="tenants">

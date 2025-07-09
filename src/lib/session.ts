@@ -1,11 +1,16 @@
 import { getIronSession } from 'iron-session'
 import jwt from 'jsonwebtoken'
 import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
+import type { UserType } from '@/types/enums'
 import 'server-only'
 
 export type User = {
-  sub: number // subject (id do suer)
-  username: string
+  sub: string
+  email: string
+  companyId: string
+  actionCompanyId: string
+  userType: UserType
   iat: number
   exp: number
 }
@@ -20,8 +25,12 @@ export async function getSession() {
     ttl,
     cookieOptions: {
       httpOnly: true,
-      secure: false, // set this to false in local (non-HTTPS) development
-      sameSite: 'lax', // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite#lax
+      secure: process.env.NODE_ENV === 'production', // só HTTPS em produção
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // ajuste para desenvolvimento
+      domain:
+        process.env.NODE_ENV === 'production'
+          ? '.qualityflow.com.br'
+          : undefined, // só em produção
       maxAge: (ttl === 0 ? 2147483647 : ttl) - 60, // Expire cookie before the session expires.
       path: '/',
     },
@@ -39,11 +48,11 @@ export async function destroySession() {
   session.destroy()
 }
 
-export async function getUser(): Promise<User | null> {
+export async function getUser() {
   const session = await getSession()
 
   if (!session.token) {
-    return null
+    redirect('/login')
   }
 
   return jwt.decode(session.token) as unknown as User

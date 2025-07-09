@@ -1,6 +1,5 @@
 'use client'
 
-import { cn } from '@/lib/utils'
 import {
   Briefcase,
   Building2,
@@ -9,6 +8,7 @@ import {
   User,
   Users2,
 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
 
 interface SidebarProps {

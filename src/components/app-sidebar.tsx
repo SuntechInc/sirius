@@ -1,4 +1,14 @@
 import {
+  Briefcase,
+  Building2,
+  Command,
+  LayoutDashboard,
+  Network,
+  User,
+  Users2,
+} from 'lucide-react'
+import Link from 'next/link'
+import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
@@ -9,16 +19,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
-import {
-  Briefcase,
-  Building2,
-  Command,
-  LayoutDashboard,
-  Network,
-  User,
-  Users2,
-} from 'lucide-react'
-import Link from 'next/link'
 
 const items = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },

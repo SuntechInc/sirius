@@ -1,7 +1,7 @@
 'use client'
 
 import type React from 'react'
-
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -20,7 +20,6 @@ import {
 } from '@/components/ui/select'
 import type { Company } from '@/types/company'
 import { Industry, Segment } from '@/types/enums'
-import { useEffect, useState } from 'react'
 
 interface CompanyModalProps {
   isOpen: boolean
@@ -75,7 +74,7 @@ export function CompanyModal({
         status: 'ativa',
       })
     }
-  }, [company, isOpen])
+  }, [company])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()

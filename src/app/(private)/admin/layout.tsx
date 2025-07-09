@@ -1,11 +1,22 @@
-export default async function AuthLayout({
+import { AdminSidebar } from '@/components/admin-sidebar'
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
+import { cookies } from 'next/headers'
+
+export default async function Layout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
+  const cookieStore = await cookies()
+  const defaultOpen = cookieStore.get('sidebar_state')?.value === 'true'
+
   return (
-    <div className="bg-muted flex min-h-svh flex-col gap-6 p-6 md:p-10">
-      {children}
-    </div>
+    <SidebarProvider defaultOpen={defaultOpen}>
+      <AdminSidebar />
+      <main className="flex-1">
+        <SidebarTrigger />
+        {children}
+      </main>
+    </SidebarProvider>
   )
 }

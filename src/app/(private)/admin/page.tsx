@@ -4,7 +4,7 @@ import { TenantManagement } from '@/components/tenant-management'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { UserAdministration } from '@/components/user-administration'
 
-export default async function AdminPage() {
+export default function AdminPage() {
   return (
     <div className="bg-gray-50 p-6">
       <div className="w-full">

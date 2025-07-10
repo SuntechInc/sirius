@@ -11,7 +11,7 @@ import {
   getErrorMessage,
   ParseError,
 } from '@/lib/effect'
-import { saveSession } from '@/lib/session'
+import { getUser, saveSession } from '@/lib/session'
 import { type AuthSchema, authSchema } from '@/lib/validations/auth'
 
 export async function loginAction(input: AuthSchema) {
@@ -59,6 +59,13 @@ export async function loginAction(input: AuthSchema) {
   const { accessToken } = result
 
   await saveSession(accessToken)
+
+  const user = await getUser()
+
+  if (user.userType === 'GLOBAL_ADMIN') {
+    revalidatePath('/admin')
+    redirect('/admin')
+  }
 
   revalidatePath('/dashboard')
   redirect('/dashboard')

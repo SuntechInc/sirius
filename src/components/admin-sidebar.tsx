@@ -1,3 +1,5 @@
+import { Building2, Command, LayoutDashboard, Network } from 'lucide-react'
+import Link from 'next/link'
 import {
   Sidebar,
   SidebarContent,
@@ -9,11 +11,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
-import { Building2, Command, LayoutDashboard, Network } from 'lucide-react'
-import Link from 'next/link'
 
 const items = [
-  { title: 'Empresas', url: '/admin', icon: LayoutDashboard },
+  { title: 'Empresas', url: '/admin/empresas', icon: LayoutDashboard },
   { title: 'Usuários', url: '/admin/usuarios', icon: Building2 },
   { title: 'Sistema', url: '/admin/sistema', icon: Network },
 ]
@@ -25,7 +25,7 @@ export function AdminSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/dashboard">
+              <Link href="/admin">
                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                   <Command className="size-4" />
                 </div>

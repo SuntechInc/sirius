@@ -24,7 +24,7 @@ export async function middleware(request: NextRequest) {
 
   // Lógica para administrador global
   if (user.userType === UserType.GLOBAL_ADMIN) {
-    if (path !== '/dashboard' && path !== '/' && !path.startsWith('/admin')) {
+    if (path !== '/' && !path.startsWith('/admin')) {
       return redirect(request, '/admin')
     }
   } else {

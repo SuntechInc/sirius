@@ -5,6 +5,11 @@ const nextConfig: NextConfig = {
   compress: false,
   eslint: {
     ignoreDuringBuilds: true,
+  },
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
   }
 }
 

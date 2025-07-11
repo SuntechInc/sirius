@@ -14,7 +14,7 @@ export type User = {
   iat: number
   exp: number
 }
-const secret = '12345678901234567890123456789012' //env var
+const secret = process.env.JWT_SECRET || '12345678901234567890123456789012' //env var
 const ttl = 60 * 60 * 24 * 7
 
 export async function getSession() {
@@ -25,13 +25,9 @@ export async function getSession() {
     ttl,
     cookieOptions: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // só HTTPS em produção
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // ajuste para desenvolvimento
-      domain:
-        process.env.NODE_ENV === 'production'
-          ? '.qualityflow.com.br'
-          : undefined, // só em produção
-      maxAge: (ttl === 0 ? 2147483647 : ttl) - 60, // Expire cookie before the session expires.
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: (ttl === 0 ? 2147483647 : ttl) - 60,
       path: '/',
     },
   })

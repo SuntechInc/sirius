@@ -1,72 +1,62 @@
 'use server'
 
-import { Effect } from 'effect'
-import { revalidatePath } from 'next/cache'
+import { Effect, pipe } from 'effect'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
-import {
-  type AppError,
-  apiClient,
-  createValidationError,
-  getErrorMessage,
-  ParseError,
-} from '@/lib/effect'
-import { getUser, saveSession } from '@/lib/session'
-import { type AuthSchema, authSchema } from '@/lib/validations/auth'
+import { runServerAction } from '@/lib/effect'
+import type { AuthSchema } from '@/lib/validations/auth'
+import { UserType } from '@/types/enums'
+import { apiClient } from '../api'
+import { getUser, saveSession } from '../session'
 
-export async function loginAction(input: AuthSchema) {
-  const program = Effect.gen(function* () {
-    const validatedData = yield* Effect.try({
-      try: () => authSchema.parse(input),
-      catch: (error): AppError => {
-        if (error instanceof z.ZodError) {
-          return createValidationError(error)
-        }
-        return new ParseError({
-          message: 'Erro na validação dos dados',
-          data: error,
-        })
-      },
-    })
-
-    const result = yield* apiClient.post(
-      '/auth/login',
-      validatedData,
-      z.object({
-        accessToken: z.string(),
-        refreshToken: z.string(),
-        user: z.object({
-          id: z.string(),
-          email: z.string().email(),
-          name: z.string(),
-        }),
-      })
-    )
-
-    return result
-  })
-
-  const result = await Effect.runPromise(
-    Effect.catchAll(program, error =>
-      Effect.succeed({ error: getErrorMessage(error) })
+const createUser = (authInput: AuthSchema) =>
+  pipe(
+    Effect.succeed(authInput),
+    Effect.flatMap(data =>
+      pipe(
+        Effect.succeed(data),
+        Effect.flatMap(validData =>
+          apiClient.post(
+            '/auth/login',
+            validData,
+            z.object({
+              accessToken: z.string(),
+              refreshToken: z.string(),
+              user: z.object({
+                id: z.string(),
+                name: z.string(),
+                email: z.string().email(),
+              }),
+            })
+          )
+        )
+      )
     )
   )
+export async function loginAction(input: AuthSchema) {
+  const effect = pipe(
+    pipe(createUser(input)),
+    Effect.tapError(error => Effect.logError('Erro ao realizar login:', error))
+  )
 
-  if ('error' in result) {
-    return { error: result.error }
+  const result = await runServerAction(effect)
+
+  console.log(result)
+
+  if (!result.success) {
+    return {
+      error: result.error._tag,
+      message: result.error.message,
+    }
   }
 
-  const { accessToken } = result
-
-  await saveSession(accessToken)
+  await saveSession(result.data.accessToken)
 
   const user = await getUser()
 
-  if (user.userType === 'GLOBAL_ADMIN') {
-    revalidatePath('/admin')
-    redirect('/admin')
+  if (user.userType !== UserType.GLOBAL_ADMIN) {
+    redirect('/dashboard')
   }
 
-  revalidatePath('/dashboard')
-  redirect('/dashboard')
+  redirect('/admin')
 }

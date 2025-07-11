@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { apiClient } from '@/lib/effect'
 import { CompanyStatus, Industry, Segment } from '@/types/enums'
+import { apiClient } from './api'
 
 export const companySchema = z.object({
   id: z.string(),

@@ -33,7 +33,9 @@ export function LoginForm() {
       const result = await loginAction(data)
 
       if (result.error) {
-        toast.error(result.error)
+        toast.error(result.error, {
+          description: result.message,
+        })
       }
     })
   }

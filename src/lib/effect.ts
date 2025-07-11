@@ -3,13 +3,13 @@ import axios, {
   type AxiosRequestConfig,
   type AxiosResponse,
 } from 'axios'
-import { Data, Effect, pipe } from 'effect'
+import { Data, Effect, Either, pipe } from 'effect'
 import type { TimeoutException } from 'effect/Cause'
+import { notFound } from 'next/navigation'
+import React from 'react'
 import { z } from 'zod'
-import { api } from '@/lib/api'
-import { getSession } from '@/lib/session'
 
-// Classes de erro mantidas
+// ==================== TIPOS DE ERRO ====================
 export class ValidationError extends Data.TaggedError('ValidationError')<{
   readonly field: string
   readonly message: string
@@ -69,35 +69,20 @@ export type AppError =
   | RateLimitError
   | TimeoutException
 
-// Solução 4: Verificar se a URL contém o padrão (mais simples)
-const isPrivateRoute = (url: string): boolean => {
-  const publicRoutes = ['/auth/login']
-
-  // Verifica se a URL contém alguma das rotas públicas
-  return !publicRoutes.some(route => url.includes(route))
+// ==================== UTILITÁRIOS DE ERRO ====================
+export const createValidationError = (
+  zodError: z.ZodError
+): ValidationError => {
+  const firstError = zodError.errors[0]
+  const field = firstError.path.join('.')
+  const message = firstError.message
+  return new ValidationError({
+    field,
+    message,
+    code: 'VALIDATION_ERROR',
+  })
 }
 
-// Interceptor corrigido
-const setupInterceptors = (axiosInstance: AxiosInstance) => {
-  axiosInstance.interceptors.request.use(
-    async config => {
-      const { token } = await getSession()
-
-      // Adiciona token apenas para rotas privadas
-      if (token && isPrivateRoute(config.url || '')) {
-        config.headers.Authorization = `Bearer ${token}`
-      }
-
-      return config
-    },
-    error => Promise.reject(error)
-  )
-}
-
-// Inicializa os interceptors
-setupInterceptors(api)
-
-// Função para converter erros do Axios para nossos tipos
 const handleAxiosError = (
   error: unknown,
   url?: string,
@@ -175,14 +160,15 @@ const handleAxiosError = (
   })
 }
 
-// Função genérica para fazer requisições HTTP com Effect usando sua instância do axios
+// ==================== FUNÇÕES PRINCIPAIS ====================
 export const httpRequest = <T>(
+  axiosInstance: AxiosInstance,
   url: string,
   config: AxiosRequestConfig = {}
 ): Effect.Effect<T, AppError> =>
   Effect.tryPromise({
     try: async (): Promise<T> => {
-      const response: AxiosResponse<T> = await api.request({
+      const response: AxiosResponse<T> = await axiosInstance.request({
         url,
         ...config,
       })
@@ -191,151 +177,217 @@ export const httpRequest = <T>(
     catch: error => handleAxiosError(error, url, config.method),
   })
 
-// Função para GET com validação Zod
-export const getWithValidation = <T>(
-  url: string,
-  schema: z.ZodSchema<T>,
-  config: Omit<AxiosRequestConfig, 'method'> = {}
+export const validateData = <T>(
+  data: unknown,
+  schema: z.ZodSchema<T>
 ): Effect.Effect<T, AppError> =>
-  pipe(
-    httpRequest<unknown>(url, { ...config, method: 'GET' }),
-    Effect.flatMap(data =>
-      Effect.try({
-        try: () => schema.parse(data),
-        catch: (error): AppError => {
-          if (error instanceof z.ZodError) {
-            return createValidationError(error)
-          }
-          return new ParseError({
-            message: 'Erro na validação dos dados',
-            data: error,
-          })
-        },
+  Effect.try({
+    try: () => schema.parse(data),
+    catch: (error): AppError => {
+      if (error instanceof z.ZodError) {
+        return createValidationError(error)
+      }
+      return new ParseError({
+        message: 'Erro na validação dos dados',
+        data: error,
       })
-    )
-  )
+    },
+  })
 
-// Função para POST com validação
-export const postWithValidation = <TRequest, TResponse>(
-  url: string,
-  data: TRequest,
-  responseSchema: z.ZodSchema<TResponse>,
-  config: Omit<AxiosRequestConfig, 'method' | 'data'> = {}
-): Effect.Effect<TResponse, AppError> =>
-  pipe(
-    httpRequest<unknown>(url, {
-      ...config,
-      method: 'POST',
-      data,
-      headers: {
-        'Content-Type': 'application/json',
-        ...config.headers,
+// ==================== CLIENTE API ====================
+export const createApiClient = (axiosInstance: AxiosInstance) => {
+  const request = <T>(url: string, config: AxiosRequestConfig = {}) =>
+    httpRequest<T>(axiosInstance, url, config)
+
+  return {
+    // GET com validação
+    get: <T>(
+      url: string,
+      schema: z.ZodSchema<T>,
+      config: Omit<AxiosRequestConfig, 'method'> = {}
+    ): Effect.Effect<T, AppError> =>
+      pipe(
+        request<unknown>(url, { ...config, method: 'GET' }),
+        Effect.flatMap(data => validateData(data, schema))
+      ),
+
+    // POST com validação
+    post: <TRequest, TResponse>(
+      url: string,
+      data: TRequest,
+      responseSchema: z.ZodSchema<TResponse>,
+      config: Omit<AxiosRequestConfig, 'method' | 'data'> = {}
+    ): Effect.Effect<TResponse, AppError> =>
+      pipe(
+        request<unknown>(url, {
+          ...config,
+          method: 'POST',
+          data,
+          headers: {
+            'Content-Type': 'application/json',
+            ...config.headers,
+          },
+        }),
+        Effect.flatMap(responseData =>
+          validateData(responseData, responseSchema)
+        )
+      ),
+
+    // PUT com validação
+    put: <TRequest, TResponse>(
+      url: string,
+      data: TRequest,
+      responseSchema: z.ZodSchema<TResponse>,
+      config: Omit<AxiosRequestConfig, 'method' | 'data'> = {}
+    ): Effect.Effect<TResponse, AppError> =>
+      pipe(
+        request<unknown>(url, {
+          ...config,
+          method: 'PUT',
+          data,
+          headers: {
+            'Content-Type': 'application/json',
+            ...config.headers,
+          },
+        }),
+        Effect.flatMap(responseData =>
+          validateData(responseData, responseSchema)
+        )
+      ),
+
+    // PATCH com validação
+    patch: <TRequest, TResponse>(
+      url: string,
+      data: TRequest,
+      responseSchema: z.ZodSchema<TResponse>,
+      config: Omit<AxiosRequestConfig, 'method' | 'data'> = {}
+    ): Effect.Effect<TResponse, AppError> =>
+      pipe(
+        request<unknown>(url, {
+          ...config,
+          method: 'PATCH',
+          data,
+          headers: {
+            'Content-Type': 'application/json',
+            ...config.headers,
+          },
+        }),
+        Effect.flatMap(responseData =>
+          validateData(responseData, responseSchema)
+        )
+      ),
+
+    // DELETE
+    delete: <T = void>(
+      url: string,
+      config: Omit<AxiosRequestConfig, 'method'> = {}
+    ): Effect.Effect<T, AppError> =>
+      request<T>(url, { ...config, method: 'DELETE' }),
+
+    // Upload de arquivo
+    uploadFile: <T>(
+      url: string,
+      file: File,
+      responseSchema: z.ZodSchema<T>,
+      additionalFields: Record<string, string> = {},
+      config: Omit<AxiosRequestConfig, 'method' | 'data'> = {}
+    ): Effect.Effect<T, AppError> => {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      Object.entries(additionalFields).forEach(([key, value]) => {
+        formData.append(key, value)
+      })
+
+      return pipe(
+        request<unknown>(url, {
+          ...config,
+          method: 'POST',
+          data: formData,
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            ...config.headers,
+          },
+        }),
+        Effect.flatMap(responseData =>
+          validateData(responseData, responseSchema)
+        )
+      )
+    },
+
+    // Buscar por ID
+    fetchById: <T>(
+      baseUrl: string,
+      id: string | number,
+      schema: z.ZodSchema<T>,
+      config: AxiosRequestConfig = {}
+    ): Effect.Effect<T, AppError> => {
+      const url = `${baseUrl}/${id}`
+      return pipe(
+        request<unknown>(url, { ...config, method: 'GET' }),
+        Effect.flatMap(data => validateData(data, schema))
+      )
+    },
+
+    // Buscar com query parameters
+    fetchWithQuery: <T>(
+      url: string,
+      schema: z.ZodSchema<T>,
+      queryParams: Record<string, string | number | boolean> = {},
+      config: AxiosRequestConfig = {}
+    ): Effect.Effect<T, AppError> => {
+      const params = { ...queryParams, ...config.params }
+      return pipe(
+        request<unknown>(url, { ...config, params, method: 'GET' }),
+        Effect.flatMap(data => validateData(data, schema))
+      )
+    },
+
+    // Buscar lista paginada
+    fetchPaginated: <T>(
+      url: string,
+      schema: z.ZodSchema<T[]>,
+      page: number = 1,
+      limit: number = 10,
+      config: AxiosRequestConfig = {}
+    ): Effect.Effect<
+      {
+        data: T[]
+        pagination: { page: number; limit: number; total?: number }
       },
-    }),
-    Effect.flatMap(responseData =>
-      Effect.try({
-        try: () => responseSchema.parse(responseData),
-        catch: (error): AppError => {
-          if (error instanceof z.ZodError) {
-            return createValidationError(error)
-          }
-          return new ParseError({
-            message: 'Erro na validação da resposta',
-            data: error,
-          })
-        },
-      })
-    )
-  )
+      AppError
+    > => {
+      const params = {
+        page: page.toString(),
+        limit: limit.toString(),
+        ...config.params,
+      }
 
-// Função para PUT com validação
-export const putWithValidation = <TRequest, TResponse>(
-  url: string,
-  data: TRequest,
-  responseSchema: z.ZodSchema<TResponse>,
-  config: Omit<AxiosRequestConfig, 'method' | 'data'> = {}
-): Effect.Effect<TResponse, AppError> =>
-  pipe(
-    httpRequest<unknown>(url, {
-      ...config,
-      method: 'PUT',
-      data,
-      headers: {
-        'Content-Type': 'application/json',
-        ...config.headers,
-      },
-    }),
-    Effect.flatMap(responseData =>
-      Effect.try({
-        try: () => responseSchema.parse(responseData),
-        catch: (error): AppError => {
-          if (error instanceof z.ZodError) {
-            return createValidationError(error)
-          }
-          return new ParseError({
-            message: 'Erro na validação da resposta',
-            data: error,
-          })
-        },
-      })
-    )
-  )
+      return pipe(
+        request<unknown>(url, { ...config, params, method: 'GET' }),
+        Effect.flatMap(data => validateData(data, schema)),
+        Effect.map(data => ({
+          data,
+          pagination: { page, limit },
+        }))
+      )
+    },
+  }
+}
 
-// Função para DELETE
-export const deleteRequest = <T = void>(
-  url: string,
-  config: Omit<AxiosRequestConfig, 'method'> = {}
-): Effect.Effect<T, AppError> =>
-  httpRequest<T>(url, { ...config, method: 'DELETE' })
-
-// Função para PATCH
-export const patchWithValidation = <TRequest, TResponse>(
-  url: string,
-  data: TRequest,
-  responseSchema: z.ZodSchema<TResponse>,
-  config: Omit<AxiosRequestConfig, 'method' | 'data'> = {}
-): Effect.Effect<TResponse, AppError> =>
-  pipe(
-    httpRequest<unknown>(url, {
-      ...config,
-      method: 'PATCH',
-      data,
-      headers: {
-        'Content-Type': 'application/json',
-        ...config.headers,
-      },
-    }),
-    Effect.flatMap(responseData =>
-      Effect.try({
-        try: () => responseSchema.parse(responseData),
-        catch: (error): AppError => {
-          if (error instanceof z.ZodError) {
-            return createValidationError(error)
-          }
-          return new ParseError({
-            message: 'Erro na validação da resposta',
-            data: error,
-          })
-        },
-      })
-    )
-  )
-
-// Função para buscar com retry automático
-export const fetchWithRetry = <T>(
-  url: string,
-  schema: z.ZodSchema<T>,
-  retries: number = 3,
-  config: AxiosRequestConfig = {}
+// ==================== UTILITÁRIOS PARA RETRY ====================
+export const withRetry = <T>(
+  effect: Effect.Effect<T, AppError>,
+  maxRetries: number = 3
 ): Effect.Effect<T, AppError> => {
   const retryLogic = (attempt: number): Effect.Effect<T, AppError> =>
     pipe(
-      getWithValidation(url, schema, config),
+      effect,
       Effect.catchAll((error: AppError) => {
         // Só faz retry para erros de rede e servidor
         if (
           (error._tag === 'NetworkError' || error._tag === 'ServerError') &&
-          attempt < retries
+          attempt < maxRetries
         ) {
           const delay = 2 ** attempt * 100
           return pipe(
@@ -350,200 +402,86 @@ export const fetchWithRetry = <T>(
   return retryLogic(0)
 }
 
-// Função para buscar lista paginada
-export const fetchPaginated = <T>(
-  url: string,
-  schema: z.ZodSchema<T[]>,
-  page: number = 1,
-  limit: number = 10,
-  config: AxiosRequestConfig = {}
-): Effect.Effect<
-  { data: T[]; pagination: { page: number; limit: number; total?: number } },
-  AppError
+// ==================== UTILITÁRIOS PARA SERVER ACTIONS ====================
+export const runServerAction = async <T>(
+  effect: Effect.Effect<T, AppError>
+): Promise<
+  { success: true; data: T } | { success: false; error: AppError }
 > => {
-  const params = {
-    page: page.toString(),
-    limit: limit.toString(),
-    ...config.params,
-  }
-
-  return pipe(
-    getWithValidation(url, schema, { ...config, params }),
-    Effect.map(data => ({
-      data,
-      pagination: { page, limit },
-    }))
-  )
-}
-
-// Função para buscar por ID
-export const fetchById = <T>(
-  baseUrl: string,
-  id: string | number,
-  schema: z.ZodSchema<T>,
-  config: AxiosRequestConfig = {}
-): Effect.Effect<T, AppError> => {
-  const url = `${baseUrl}/${id}`
-  return getWithValidation(url, schema, config)
-}
-
-// Função para buscar com query parameters
-export const fetchWithQuery = <T>(
-  url: string,
-  schema: z.ZodSchema<T>,
-  queryParams: Record<string, string | number | boolean> = {},
-  config: AxiosRequestConfig = {}
-): Effect.Effect<T, AppError> => {
-  const params = {
-    ...queryParams,
-    ...config.params,
-  }
-
-  return getWithValidation(url, schema, { ...config, params })
-}
-
-// Função para fazer upload de arquivos
-export const uploadFile = <T>(
-  url: string,
-  file: File,
-  responseSchema: z.ZodSchema<T>,
-  additionalFields: Record<string, string> = {},
-  config: Omit<AxiosRequestConfig, 'method' | 'data'> = {}
-): Effect.Effect<T, AppError> => {
-  const formData = new FormData()
-  formData.append('file', file)
-
-  Object.entries(additionalFields).forEach(([key, value]) => {
-    formData.append(key, value)
-  })
-
-  return pipe(
-    httpRequest<unknown>(url, {
-      ...config,
-      method: 'POST',
-      data: formData,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        ...config.headers,
-      },
-    }),
-    Effect.flatMap(responseData =>
-      Effect.try({
-        try: () => responseSchema.parse(responseData),
-        catch: (error): AppError => {
-          if (error instanceof z.ZodError) {
-            return createValidationError(error)
-          }
-          return new ParseError({
-            message: 'Erro na validação da resposta',
-            data: error,
-          })
-        },
+  return pipe(effect, Effect.either, Effect.runPromise, promise =>
+    promise.then(either =>
+      Either.match(either, {
+        onLeft: error => ({ success: false as const, error }),
+        onRight: data => ({ success: true as const, data }),
       })
     )
   )
 }
 
-// Função para criar um cliente API tipado
-export const createApiClient = () => {
+// ==================== HOOK REACT ====================
+export const useApiEffect = <T>(
+  effect: Effect.Effect<T, AppError>,
+  deps: React.DependencyList = []
+): {
+  data: T | null
+  error: AppError | null
+  loading: boolean
+  refetch: () => void
+} => {
+  const [state, setState] = React.useState<{
+    data: T | null
+    error: AppError | null
+    loading: boolean
+  }>({
+    data: null,
+    error: null,
+    loading: true,
+  })
+
+  const executeEffect = React.useCallback(async () => {
+    setState(prev => ({ ...prev, loading: true, error: null }))
+
+    try {
+      const result = await Effect.runPromise(effect)
+      setState({ data: result, error: null, loading: false })
+    } catch (error) {
+      setState({
+        data: null,
+        error: error as AppError,
+        loading: false,
+      })
+    }
+  }, deps)
+
+  React.useEffect(() => {
+    executeEffect()
+  }, [executeEffect])
+
   return {
-    get: <T>(
-      url: string,
-      schema: z.ZodSchema<T>,
-      config?: AxiosRequestConfig
-    ) => getWithValidation(url, schema, config),
-
-    post: <TRequest, TResponse>(
-      url: string,
-      data: TRequest,
-      responseSchema: z.ZodSchema<TResponse>,
-      config?: AxiosRequestConfig
-    ) => postWithValidation(url, data, responseSchema, config),
-
-    put: <TRequest, TResponse>(
-      url: string,
-      data: TRequest,
-      responseSchema: z.ZodSchema<TResponse>,
-      config?: AxiosRequestConfig
-    ) => putWithValidation(url, data, responseSchema, config),
-
-    patch: <TRequest, TResponse>(
-      url: string,
-      data: TRequest,
-      responseSchema: z.ZodSchema<TResponse>,
-      config?: AxiosRequestConfig
-    ) => patchWithValidation(url, data, responseSchema, config),
-
-    delete: <T = void>(url: string, config?: AxiosRequestConfig) =>
-      deleteRequest<T>(url, config),
-
-    fetchById: <T>(
-      baseUrl: string,
-      id: string | number,
-      schema: z.ZodSchema<T>,
-      config?: AxiosRequestConfig
-    ) => fetchById(baseUrl, id, schema, config),
-
-    fetchWithQuery: <T>(
-      url: string,
-      schema: z.ZodSchema<T>,
-      queryParams?: Record<string, string | number | boolean>,
-      config?: AxiosRequestConfig
-    ) => fetchWithQuery(url, schema, queryParams, config),
-
-    fetchPaginated: <T>(
-      url: string,
-      schema: z.ZodSchema<T[]>,
-      page?: number,
-      limit?: number,
-      config?: AxiosRequestConfig
-    ) => fetchPaginated(url, schema, page, limit, config),
-
-    uploadFile: <T>(
-      url: string,
-      file: File,
-      responseSchema: z.ZodSchema<T>,
-      additionalFields?: Record<string, string>,
-      config?: AxiosRequestConfig
-    ) => uploadFile(url, file, responseSchema, additionalFields, config),
+    ...state,
+    refetch: executeEffect,
   }
 }
 
-// Instância do cliente API
-export const apiClient = createApiClient()
+export const runServerEffect = async <T>(
+  effect: Effect.Effect<T, AppError>
+): Promise<T> => {
+  const result = await runServerAction(effect)
 
-// Funções helper existentes
-export const createValidationError = (
-  zodError: z.ZodError
-): ValidationError => {
-  const firstError = zodError.errors[0]
-  const field = firstError.path.join('.')
-  const message = firstError.message
-  return new ValidationError({
-    field,
-    message,
-    code: 'VALIDATION_ERROR',
-  })
-}
+  if (!result.success) {
+    // Se for erro 404, usar notFound() do Next.js
+    if (result.error._tag === 'NotFoundError') {
+      notFound()
+    }
 
-export const handleApiError = (error: unknown): AppError => {
-  if (axios.isAxiosError(error)) {
-    return handleAxiosError(error)
+    // Para outros erros, propagar
+    throw new Error(result.error.message || 'Erro no servidor')
   }
 
-  if (error instanceof Error && error.message.includes('Network')) {
-    return new NetworkError({
-      message: 'Verifique sua conexão com a internet',
-      originalError: error,
-    })
-  }
-
-  return new ApiError({
-    message: 'Erro inesperado na API',
-    statusCode: 500,
-  })
+  return result.data
 }
 
+// ==================== UTILITÁRIOS DE MENSAGENS ====================
 export const getErrorMessage = (error: AppError): string => {
   switch (error._tag) {
     case 'ValidationError':
@@ -582,6 +520,7 @@ const getAuthMessage = (code: string, fallback: string): string => {
   return messages[code] || fallback
 }
 
+// ==================== FACTORY DE ERROS ====================
 export const createError = {
   validation: (field: string, message: string) =>
     new ValidationError({ field, message, code: 'VALIDATION_ERROR' }),

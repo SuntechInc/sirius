@@ -19,17 +19,20 @@ export const companySchema = z.object({
 
 export type Company = z.infer<typeof companySchema>
 
-export const getCompanies = apiClient.get(
-  '/companies',
-  z.object({
-    data: z.array(companySchema),
-    pagination: z.object({
-      hasNext: z.boolean(),
-      hasPrevious: z.boolean(),
-      page: z.number(),
-      size: z.number(),
-      total: z.number(),
-      totalPages: z.number(),
+export const getCompanies = (params?: Record<string, any>) =>
+  apiClient.get(
+    '/companies/filter',
+    z.object({
+      data: z.array(companySchema),
+      pagination: z.object({
+        hasNext: z.boolean(),
+        hasPrevious: z.boolean(),
+        page: z.number(),
+        size: z.number(),
+        total: z.number(),
+        totalPages: z.number(),
+      }),
+      filter: z.any().optional(),
     }),
-  })
-)
+    { params }
+  )

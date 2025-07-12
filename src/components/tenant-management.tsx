@@ -9,12 +9,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { getCompanies } from '@/lib/company.'
+import { getCompanies } from '@/lib/company'
 import { getErrorMessage } from '@/lib/effect'
 
 export async function TenantManagement() {
   const result = await Effect.runPromise(
-    Effect.catchAll(getCompanies, error =>
+    Effect.catchAll(getCompanies(), error =>
       Effect.succeed({ error: getErrorMessage(error) })
     )
   )

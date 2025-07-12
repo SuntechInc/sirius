@@ -9,7 +9,7 @@ import { getCompanies } from '@/lib/company'
 import { runServerEffect } from '@/lib/effect'
 
 export default async function CompaniesPage() {
-  const result = await runServerEffect(getCompanies)
+  const result = await runServerEffect(getCompanies())
 
   return (
     <div className="p-6">

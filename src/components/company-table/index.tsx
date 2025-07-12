@@ -12,8 +12,8 @@ import {
   type VisibilityState,
 } from '@tanstack/react-table'
 import React from 'react'
-import { DataTablePagination } from '@/components/data-table-pagination'
-import { DataTableViewOptions } from '@/components/data-table-view-options'
+import { DataTablePagination } from '@/components/data-table/data-table-pagination'
+import { DataTableViewOptions } from '@/components/data-table/data-table-view-options'
 import { Input } from '@/components/ui/input'
 import {
   Table,

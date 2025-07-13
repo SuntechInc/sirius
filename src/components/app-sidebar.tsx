@@ -1,13 +1,19 @@
+"use client"
+
 import {
-  Briefcase,
-  Building2,
   Command,
   LayoutDashboard,
+  FileText,
+  Building2,
   Network,
-  User,
   Users2,
+  User,
+  Briefcase,
+  ChevronDown,
+  ChevronRight,
 } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
 import {
   Sidebar,
   SidebarContent,
@@ -18,18 +24,21 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
 } from '@/components/ui/sidebar'
 
-const items = [
-  { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
-  { title: 'Empresas', url: '/dashboard/empresas', icon: Building2 },
-  { title: 'Filiais', url: '/dashboard/filiais', icon: Network },
-  { title: 'Departamentos', url: '/dashboard/departamentos', icon: Users2 },
-  { title: 'Funcionários', url: '/dashboard/funcionarios', icon: User },
-  { title: 'Cargos', url: '/dashboard/cargos', icon: Briefcase },
+const cadastrosItems = [
+  { title: 'Empresas e Filiais', url: '/cadastro/empresas', icon: Building2 },
+  { title: 'Departamentos', url: '/cadastro/departamentos', icon: Users2 },
+  { title: 'Funcionários', url: '/cadastro/funcionarios', icon: User },
+  { title: 'Cargos', url: '/cadastro/cargos', icon: Briefcase },
 ]
 
 export function AppSidebar() {
+  const [cadastrosOpen, setCadastrosOpen] = useState(false)
+
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
@@ -54,16 +63,50 @@ export function AppSidebar() {
           <SidebarGroupLabel>Sistema de Gestão</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map(item => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link href="/dashboard">
+                    <LayoutDashboard />
+                    <span>Dashboard</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <div className="flex items-center w-full">
+                  <SidebarMenuButton asChild className="flex-1">
+                    <Link href="/cadastro">
+                      <FileText />
+                      <span>Cadastros</span>
                     </Link>
                   </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+                  <button
+                    type="button"
+                    aria-label={cadastrosOpen ? 'Fechar submenu' : 'Abrir submenu'}
+                    onClick={() => setCadastrosOpen((open) => !open)}
+                    className="ml-1 p-1 rounded hover:bg-sidebar-accent"
+                  >
+                    {cadastrosOpen ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+                {cadastrosOpen && (
+                  <SidebarMenuSub>
+                    {cadastrosItems.map(item => (
+                      <SidebarMenuSubItem key={item.title}>
+                        <SidebarMenuSubButton asChild>
+                          <Link href={item.url}>
+                            <item.icon className="mr-2 h-4 w-4" />
+                            <span>{item.title}</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    ))}
+                  </SidebarMenuSub>
+                )}
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

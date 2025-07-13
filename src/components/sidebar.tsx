@@ -19,7 +19,6 @@ interface SidebarProps {
 const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'empresas', label: 'Empresas', icon: Building2 },
-  { id: 'filiais', label: 'Filiais', icon: Network },
   { id: 'departamentos', label: 'Departamentos', icon: Users2 },
   { id: 'funcionarios', label: 'Funcionários', icon: User },
   { id: 'cargos', label: 'Cargos', icon: Briefcase },

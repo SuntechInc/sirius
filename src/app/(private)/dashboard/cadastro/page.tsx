@@ -1,4 +1,4 @@
-import { Building2, Network, Users2, User, Briefcase } from 'lucide-react'
+import { Briefcase, Building2, User, Users2 } from 'lucide-react'
 import Link from 'next/link'
 
 const cadastros = [
@@ -42,7 +42,7 @@ export default function CadastroPage() {
         </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {cadastros.map((item) => (
+        {cadastros.map(item => (
           <Link key={item.title} href={item.url} className="group block">
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200 group-hover:border-gray-300">
               <div className="flex items-center space-x-4">

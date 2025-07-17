@@ -1,24 +1,17 @@
-"use client"
+'use client'
 
-import {
-  Command,
-  LayoutDashboard,
-  FileText,
-  Building2,
-  Network,
-  Users2,
-  User,
-  Briefcase,
-  ChevronDown,
-  ChevronRight,
-} from 'lucide-react'
+import { ChevronRight, Command, FileEdit, LayoutDashboard } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { usePathname } from 'next/navigation'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible'
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
-  SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
@@ -29,18 +22,26 @@ import {
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar'
 
-const cadastrosItems = [
-  { title: 'Empresas e Filiais', url: '/cadastro/empresas', icon: Building2 },
-  { title: 'Departamentos', url: '/cadastro/departamentos', icon: Users2 },
-  { title: 'Funcionários', url: '/cadastro/funcionarios', icon: User },
-  { title: 'Cargos', url: '/cadastro/cargos', icon: Briefcase },
+const items = [
+  {
+    title: 'Cadastro',
+    url: '/dashboard/cadastro',
+    icon: FileEdit,
+    items: [
+      { title: 'Geral', url: '/dashboard/cadastro' },
+      { title: 'Empresas e Filiais', url: '/dashboard/cadastro/empresas' },
+      { title: 'Departamentos', url: '/dashboard/cadastro/departamentos' },
+      { title: 'Funcionários', url: '/dashboard/cadastro/funcionarios' },
+      { title: 'Cargos', url: '/dashboard/cadastro/cargos' },
+    ],
+  },
 ]
 
 export function AppSidebar() {
-  const [cadastrosOpen, setCadastrosOpen] = useState(false)
+  const pathname = usePathname()
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -60,55 +61,48 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Sistema de Gestão</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/dashboard">
-                    <LayoutDashboard />
-                    <span>Dashboard</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <div className="flex items-center w-full">
-                  <SidebarMenuButton asChild className="flex-1">
-                    <Link href="/cadastro">
-                      <FileText />
-                      <span>Cadastros</span>
-                    </Link>
-                  </SidebarMenuButton>
-                  <button
-                    type="button"
-                    aria-label={cadastrosOpen ? 'Fechar submenu' : 'Abrir submenu'}
-                    onClick={() => setCadastrosOpen((open) => !open)}
-                    className="ml-1 p-1 rounded hover:bg-sidebar-accent"
-                  >
-                    {cadastrosOpen ? (
-                      <ChevronDown className="h-4 w-4" />
-                    ) : (
-                      <ChevronRight className="h-4 w-4" />
-                    )}
-                  </button>
-                </div>
-                {cadastrosOpen && (
-                  <SidebarMenuSub>
-                    {cadastrosItems.map(item => (
-                      <SidebarMenuSubItem key={item.title}>
-                        <SidebarMenuSubButton asChild>
-                          <Link href={item.url}>
-                            <item.icon className="mr-2 h-4 w-4" />
-                            <span>{item.title}</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    ))}
-                  </SidebarMenuSub>
-                )}
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
+          <SidebarGroupLabel>Painel do cliente</SidebarGroupLabel>
+          <SidebarMenu>
+            {items.map((item, i) => {
+              const isActive = pathname === item.items[i].url
+
+              return (
+                <Collapsible
+                  key={item.title}
+                  asChild
+                  defaultOpen={isActive}
+                  className="group/collapsible"
+                >
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton tooltip={item.title}>
+                        {item.icon && <item.icon />}
+                        <span>{item.title}</span>
+                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        {item.items?.map(subItem => {
+                          const isActive = pathname === subItem.url
+
+                          return (
+                            <SidebarMenuSubItem key={subItem.title}>
+                              <SidebarMenuSubButton asChild isActive={isActive}>
+                                <a href={subItem.url}>
+                                  <span>{subItem.title}</span>
+                                </a>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          )
+                        })}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
+              )
+            })}
+          </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>

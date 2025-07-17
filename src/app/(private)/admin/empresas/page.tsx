@@ -1,15 +1,40 @@
-import { Effect } from 'effect'
-import { AlertCircle, PlusCircle } from 'lucide-react'
+import { pipe } from 'effect'
+import { PlusCircle } from 'lucide-react'
 import Link from 'next/link'
+import { z } from 'zod'
 import { columns } from '@/components/company-table/columns'
 import { DataTable } from '@/components/data-table'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { getCompanies } from '@/lib/company'
-import { runServerEffect } from '@/lib/effect'
+import { ApiClient } from '@/lib/effect/api-client'
+import { runEffect } from '@/lib/effect/utils'
+import { companySchema } from '@/lib/queries/company'
 
 export default async function CompaniesPage() {
-  const result = await runServerEffect(getCompanies())
+  const apiClient = new ApiClient()
+
+  const result = await runEffect(
+    pipe(
+      apiClient.get(
+        '/companies/filter',
+        z.object({
+          data: z.array(companySchema),
+          pagination: z.object({
+            hasNext: z.boolean(),
+            hasPrevious: z.boolean(),
+            page: z.number(),
+            size: z.number(),
+            total: z.number(),
+            totalPages: z.number(),
+          }),
+          filter: z.any().optional(),
+        })
+      )
+    )
+  )
+
+  if ('error' in result) {
+    return <div>{result.error}</div>
+  }
 
   return (
     <div className="p-6">
@@ -28,7 +53,7 @@ export default async function CompaniesPage() {
             </Link>
           </Button>
         </div>
-        <DataTable columns={columns} data={result.data} />
+        <DataTable columns={columns} data={result.data.data} />
       </div>
     </div>
   )

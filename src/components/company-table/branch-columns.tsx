@@ -1,5 +1,5 @@
 import type { ColumnDef } from '@tanstack/react-table'
-import { Branch } from '@/lib/company'
+import type { Branch } from '@/lib/queries/branch'
 
 export const branchColumns: ColumnDef<Branch>[] = [
   {
@@ -34,4 +34,4 @@ export const branchColumns: ColumnDef<Branch>[] = [
     accessorKey: 'status',
     header: 'Status',
   },
-] 
+]

@@ -1,39 +1,47 @@
-import axios from 'axios'
-import { createApiClient } from './effect'
+import axios, { type AxiosInstance } from 'axios'
+import { ApiError, NetworkError } from '@/types/api'
 import { getSession } from './session'
 
-// Criar instância do axios com interceptors
-const createAxiosInstance = () => {
-  const instance = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL || '/api',
+export const createHttpClient = (baseURL: string): AxiosInstance => {
+  const client = axios.create({
+    baseURL,
     timeout: 10000,
     headers: {
       'Content-Type': 'application/json',
     },
   })
 
-  // Interceptor para adicionar token
-  instance.interceptors.request.use(
+  // Interceptor para requests
+  client.interceptors.request.use(
     async config => {
+      // Adicionar token de autenticação se necessário
       const { token } = await getSession()
-
-      // Rotas públicas que não precisam de token
-      const publicRoutes = ['/auth/login', '/auth/register']
-      const isPublicRoute = publicRoutes.some(route =>
-        config.url?.includes(route)
-      )
-
-      if (token && !isPublicRoute) {
+      if (token) {
         config.headers.Authorization = `Bearer ${token}`
       }
-
       return config
     },
     error => Promise.reject(error)
   )
 
-  return instance
-}
+  // Interceptor para responses
+  client.interceptors.response.use(
+    response => response,
+    error => {
+      if (error.response) {
+        // Erro com resposta do servidor
+        throw new ApiError(
+          error.response.data?.message || 'Erro na API',
+          error.response.status,
+          error.response.data?.code
+        )
+      } else if (error.request) {
+        throw new NetworkError('Erro de conexão', error)
+      } else {
+        throw new Error('Erro desconhecido')
+      }
+    }
+  )
 
-const axiosInstance = createAxiosInstance()
-export const apiClient = createApiClient(axiosInstance)
+  return client
+}

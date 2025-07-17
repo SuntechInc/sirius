@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronRight, Command, FileEdit, LayoutDashboard } from 'lucide-react'
+import { ChevronRight, Command, FileEdit } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {

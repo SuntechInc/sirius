@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import type { Company } from '@/lib/company'
+import type { Company } from '@/lib/queries/company'
 import {
   getCompanyStatus,
   getFormattedIndustry,
@@ -41,9 +41,13 @@ export const columns: ColumnDef<Company>[] = [
           <br />
           <span className="text-xs text-gray-500">{legalName}</span>
           <div className="absolute z-20 hidden group-hover:block left-0 top-full mt-1 w-62 max-w-xs break-words rounded-lg border border-gray-200 bg-white text-gray-900 text-xs shadow-lg p-3 transition-opacity duration-200 opacity-0 group-hover:opacity-100">
-            <div className="mb-1 font-semibold text-sm text-gray-700">Nome Fantasia:</div>
+            <div className="mb-1 font-semibold text-sm text-gray-700">
+              Nome Fantasia:
+            </div>
             <div className="mb-2 text-gray-900 break-words">{tradingName}</div>
-            <div className="font-semibold text-sm text-gray-700">Razão Social:</div>
+            <div className="font-semibold text-sm text-gray-700">
+              Razão Social:
+            </div>
             <div className="text-gray-900 break-words">{legalName}</div>
           </div>
         </div>
@@ -83,28 +87,32 @@ export const columns: ColumnDef<Company>[] = [
       let colorClass = ''
       switch (status) {
         case 'ACTIVE':
-          colorClass = 'bg-green-100 text-green-800 border-green-200';
-          break;
+          colorClass = 'bg-green-100 text-green-800 border-green-200'
+          break
         case 'INACTIVE':
-          colorClass = 'bg-gray-100 text-gray-800 border-gray-200';
-          break;
+          colorClass = 'bg-gray-100 text-gray-800 border-gray-200'
+          break
         case 'SUSPENDED':
-          colorClass = 'bg-yellow-100 text-yellow-800 border-yellow-200';
-          break;
+          colorClass = 'bg-yellow-100 text-yellow-800 border-yellow-200'
+          break
         case 'CLOSED':
-          colorClass = 'bg-red-200 text-red-900 border-red-300';
-          break;
+          colorClass = 'bg-red-200 text-red-900 border-red-300'
+          break
         case 'TRIAL':
-          colorClass = 'bg-blue-100 text-blue-800 border-blue-200';
-          break;
+          colorClass = 'bg-blue-100 text-blue-800 border-blue-200'
+          break
         case 'CANCELLED':
-          colorClass = 'bg-red-100 text-red-800 border-red-200';
-          break;
+          colorClass = 'bg-red-100 text-red-800 border-red-200'
+          break
         default:
-          colorClass = 'bg-gray-100 text-gray-800 border-gray-200';
+          colorClass = 'bg-gray-100 text-gray-800 border-gray-200'
       }
       return (
-        <span className={`px-2 py-1 rounded text-xs font-semibold border ${colorClass}`}>{statusText}</span>
+        <span
+          className={`px-2 py-1 rounded text-xs font-semibold border ${colorClass}`}
+        >
+          {statusText}
+        </span>
       )
     },
   },

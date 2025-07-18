@@ -1,10 +1,8 @@
 import { pipe } from 'effect'
-import { PlusCircle } from 'lucide-react'
-import Link from 'next/link'
 import { z } from 'zod'
 import { branchColumns } from '@/components/company-table/branch-columns'
 import { DataTable } from '@/components/data-table'
-import { Button } from '@/components/ui/button'
+import { CompanyFormModal } from '@/components/company-form-modal'
 import { ApiClient } from '@/lib/effect/api-client'
 import { runEffect } from '@/lib/effect/utils'
 import { branchSchema } from '@/lib/queries/branch'
@@ -50,12 +48,7 @@ export default async function BranchesPage() {
               Gerencie as empresas e filiais do sistema
             </p>
           </div>
-          <Button asChild>
-            <Link href="/cadastro/empresas/criar">
-              <PlusCircle className="size-4" />
-              Cadastrar nova filial
-            </Link>
-          </Button>
+          <CompanyFormModal />
         </div>
         <DataTable columns={branchColumns} data={result.data.data} />
       </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronRight, Command, FileEdit } from 'lucide-react'
+import { ChevronRight, Command, FileEdit, LayoutDashboard } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
@@ -24,15 +24,20 @@ import {
 
 const items = [
   {
+    title: 'Dashboard',
+    url: '/dashboard',
+    icon: LayoutDashboard,
+  },
+  {
     title: 'Cadastro',
-    url: '/dashboard/cadastro',
+    url: '/cadastro',
     icon: FileEdit,
     items: [
-      { title: 'Geral', url: '/dashboard/cadastro' },
-      { title: 'Empresas e Filiais', url: '/dashboard/cadastro/empresas' },
-      { title: 'Departamentos', url: '/dashboard/cadastro/departamentos' },
-      { title: 'Funcionários', url: '/dashboard/cadastro/funcionarios' },
-      { title: 'Cargos', url: '/dashboard/cadastro/cargos' },
+      { title: 'Geral', url: '/cadastro' },
+      { title: 'Empresas e Filiais', url: '/cadastro/empresas' },
+      { title: 'Departamentos', url: '/cadastro/departamentos' },
+      { title: 'Funcionários', url: '/cadastro/funcionarios' },
+      { title: 'Cargos', url: '/cadastro/cargos' },
     ],
   },
 ]
@@ -64,7 +69,23 @@ export function AppSidebar() {
           <SidebarGroupLabel>Painel do cliente</SidebarGroupLabel>
           <SidebarMenu>
             {items.map((item, i) => {
-              const isActive = pathname === item.items[i].url
+              // Se o item não tem subitens, é um item simples
+              if (!item.items) {
+                const isActive = pathname === item.url
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild isActive={isActive}>
+                      <Link href={item.url}>
+                        {item.icon && <item.icon />}
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              }
+
+              // Se tem subitens, é um item colapsível
+              const isActive = item.items.some(subItem => pathname === subItem.url)
 
               return (
                 <Collapsible

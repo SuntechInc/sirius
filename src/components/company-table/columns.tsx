@@ -1,7 +1,7 @@
 'use client'
 
 import type { ColumnDef } from '@tanstack/react-table'
-import { MoreHorizontal } from 'lucide-react'
+import { MoreHorizontal, Settings, Eye, Edit } from 'lucide-react'
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header'
 import { Button } from '@/components/ui/button'
 import {
@@ -146,7 +146,7 @@ export const columns: ColumnDef<Company>[] = [
   {
     id: 'actions',
     cell: ({ row }) => {
-      const payment = row.original
+      const company = row.original
 
       return (
         <DropdownMenu>
@@ -157,15 +157,20 @@ export const columns: ColumnDef<Company>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
-            >
-              Copy payment ID
+            <DropdownMenuLabel>Ações</DropdownMenuLabel>
+            <DropdownMenuItem onClick={() => window.dispatchEvent(new CustomEvent('manageModules', { detail: company }))}>
+              <Settings className="mr-2 h-4 w-4" />
+              Gerenciar Módulos
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(company.id)}>
+              <Eye className="mr-2 h-4 w-4" />
+              Copiar ID
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => window.open(`/admin/empresas/${company.id}/editar`, '_blank')}>
+              <Edit className="mr-2 h-4 w-4" />
+              Editar
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )

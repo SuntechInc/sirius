@@ -2,11 +2,12 @@ import { pipe } from 'effect'
 import { z } from 'zod'
 import { branchColumns } from '@/components/company-table/branch-columns'
 import { DataTable } from '@/components/data-table'
-import { CompanyFormModal } from '@/components/company-form-modal'
+import { BranchCreateModal } from '@/components/branch-create-modal'
 import { ApiClient } from '@/lib/effect/api-client'
 import { runEffect } from '@/lib/effect/utils'
 import { branchSchema } from '@/lib/queries/branch'
 import { getUser } from '@/lib/session'
+import type { CreateBranchData } from '@/lib/configs/form-configs'
 
 export default async function BranchesPage() {
   const user = await getUser()
@@ -48,7 +49,17 @@ export default async function BranchesPage() {
               Gerencie as empresas e filiais do sistema
             </p>
           </div>
-          <CompanyFormModal />
+          <BranchCreateModal 
+            onSubmit={async (data: CreateBranchData) => {
+              // TODO: Implementar chamada da API
+              console.log('Dados da filial:', data)
+              
+              // Simular delay da API
+              await new Promise(resolve => setTimeout(resolve, 1000))
+              
+              return { success: true }
+            }}
+          />
         </div>
         <DataTable columns={branchColumns} data={result.data.data} />
       </div>

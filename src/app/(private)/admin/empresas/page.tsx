@@ -1,9 +1,7 @@
 import { pipe } from 'effect'
-import { PlusCircle } from 'lucide-react'
-import Link from 'next/link'
 import { z } from 'zod'
 import { CompaniesTable } from '@/components/company-table/companies-table'
-import { Button } from '@/components/ui/button'
+import { CompanyCreateModal } from '@/components/company-create-modal'
 import { ApiClient } from '@/lib/effect/api-client'
 import { runEffect } from '@/lib/effect/utils'
 import { companySchema } from '@/lib/queries/company'
@@ -42,12 +40,7 @@ export default async function CompaniesPage() {
           <h1 className="text-3xl font-bold">Empresas</h1>
           <p className="text-muted-foreground">Gerenciamento de todas as empresas</p>
         </div>
-        <Button asChild>
-          <Link href="/admin/empresas/criar">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Criar nova empresa
-          </Link>
-        </Button>
+        <CompanyCreateModal />
       </div>
 
       <CompaniesTable data={result.data.data} />

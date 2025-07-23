@@ -10,14 +10,9 @@ import { Separator } from "@/components/ui/separator"
 import { CheckCircle, XCircle, Settings, Package, X } from "lucide-react"
 import { toast } from "sonner"
 import type { Company } from "@/lib/queries/company"
+import type { Module, CompanyModule } from "@/lib/queries/module"
 import { getFormattedIndustry, getFormattedSegment } from "@/lib/utils"
-
-interface Module {
-  id: string
-  code: string
-  name: string
-  description?: string
-}
+import { getAvailableModulesAction, getCompanyModulesAction, enableCompanyModuleAction } from "@/lib/actions/module"
 
 interface TenantModule {
   companyId: string
@@ -40,8 +35,8 @@ export function CompanyModulesModal({ company, isOpen, onClose, onSave }: Compan
   const [tenantModules, setTenantModules] = useState<TenantModule[]>([])
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [togglingModules, setTogglingModules] = useState<Set<string>>(new Set())
 
-  // Mock data - replace with actual API calls
   useEffect(() => {
     if (company && isOpen) {
       fetchModulesData()
@@ -51,102 +46,106 @@ export function CompanyModulesModal({ company, isOpen, onClose, onSave }: Compan
   const fetchModulesData = async () => {
     setLoading(true)
     try {
-      // Mock available modules based on segment
-      const mockModules: Module[] = [
-        {
-          id: "1",
-          code: "EQUIPMENTS",
-          name: "Gestão de Equipamentos",
-          description: "Sistema completo para gestão de equipamentos médicos e hospitalares",
-        },
-        {
-          id: "2",
-          code: "INVENTORY",
-          name: "Controle de Estoque",
-          description: "Gerenciamento de inventário e suprimentos",
-        },
-        {
-          id: "3",
-          code: "MAINTENANCE",
-          name: "Manutenção Preventiva",
-          description: "Agendamento e controle de manutenções",
-        },
-        {
-          id: "4",
-          code: "REPORTS",
-          name: "Relatórios Avançados",
-          description: "Dashboard e relatórios personalizados",
-        },
-        {
-          id: "5",
-          code: "CALIBRATION",
-          name: "Calibração",
-          description: "Controle de calibração de equipamentos",
-        },
-        {
-          id: "6",
-          code: "DOCUMENTS",
-          name: "Gestão de Documentos",
-          description: "Controle de documentação técnica e certificados",
-        },
-      ]
+      // Buscar módulos disponíveis da API
+      const availableResult = await getAvailableModulesAction()
+      if (!availableResult.success || !availableResult.data) {
+        toast.error(availableResult.error || "Erro ao carregar módulos disponíveis")
+        return
+      }
 
-      // Mock current tenant modules
-      const mockTenantModules: TenantModule[] = [
-        {
-          companyId: company!.id,
-          moduleId: "1",
-          segment: company!.segment,
-          status: "ENABLED",
-          enabledAt: new Date().toISOString(),
-        },
-        {
-          companyId: company!.id,
-          moduleId: "2",
-          segment: company!.segment,
-          status: "DISABLED",
-          enabledAt: new Date().toISOString(),
-          disabledAt: new Date().toISOString(),
-        },
-      ]
+      // Buscar módulos da empresa da API
+      const companyResult = await getCompanyModulesAction(company!.id)
+      if (!companyResult.success || !companyResult.data) {
+        toast.error(companyResult.error || "Erro ao carregar módulos da empresa")
+        return
+      }
 
-      setAvailableModules(mockModules)
-      setTenantModules(mockTenantModules)
+
+      const convertedTenantModules: TenantModule[] = (companyResult.data as any).data.map((cm: CompanyModule) => ({
+        companyId: company!.id,
+        moduleId: cm.moduleId,
+        segment: company!.segment,
+        status: cm.status === 'ENABLED' ? "ENABLED" : "DISABLED",
+        enabledAt: cm.enabledAt,
+        disabledAt: cm.status === 'ENABLED' ? undefined : cm.updatedAt,
+      }))
+
+      setAvailableModules((availableResult.data as any).data)
+      setTenantModules(convertedTenantModules)
     } catch (error) {
-      toast.error("Erro ao carregar módulos")
     } finally {
       setLoading(false)
     }
   }
 
-  const handleModuleToggle = (moduleId: string, enabled: boolean) => {
-    setTenantModules((prev) => {
-      const existing = prev.find((tm) => tm.moduleId === moduleId)
+  const handleModuleToggle = async (moduleId: string, enabled: boolean) => {
+    if (!company) return
 
-      if (existing) {
-        return prev.map((tm) =>
-          tm.moduleId === moduleId
-            ? {
-                ...tm,
-                status: enabled ? "ENABLED" : "DISABLED",
-                disabledAt: enabled ? undefined : new Date().toISOString(),
-              }
-            : tm,
-        )
+   
+    const module = availableModules.find(m => m.id === moduleId)
+    if (!module) {
+      toast.error("Módulo não encontrado")
+      return
+    }
+
+
+    setTogglingModules(prev => new Set(prev).add(moduleId))
+
+    try {
+      if (enabled) {
+
+        const result = await enableCompanyModuleAction(company.id, module.code, company.segment)
+        
+        if (!result.success) {
+          toast.error(result.error || "Erro ao ativar módulo")
+          return
+        }
+
+        setTenantModules((prev) => {
+          const existing = prev.find((tm) => tm.moduleId === moduleId)
+          
+          if (existing) {
+            return prev.map((tm) =>
+              tm.moduleId === moduleId
+                ? {
+                    ...tm,
+                    status: "ENABLED",
+                    enabledAt: (result.data as any).enabledAt,
+                  }
+                : tm,
+            )
+          } else {
+            // Criar novo módulo ativo
+            return [
+              ...prev,
+              {
+                companyId: company.id,
+                moduleId: (result.data as any).moduleId,
+                segment: company.segment,
+                status: "ENABLED",
+                enabledAt: (result.data as any).enabledAt,
+              },
+            ]
+          }
+        })
+
+        toast.success("Módulo ativado com sucesso!")
       } else {
-        return [
-          ...prev,
-          {
-            companyId: company!.id,
-            moduleId,
-            segment: company!.segment,
-            status: enabled ? "ENABLED" : "DISABLED",
-            enabledAt: new Date().toISOString(),
-            disabledAt: enabled ? undefined : new Date().toISOString(),
-          },
-        ]
+        // TODO: Implementar desativação quando a API estiver disponível
+        toast.info("Desativação de módulos será implementada em breve")
+        return
       }
-    })
+    } catch (error) {
+      console.error('Erro ao alterar status do módulo:', error)
+      toast.error("Erro ao alterar status do módulo")
+    } finally {
+      // Remover módulo do set de loading
+      setTogglingModules(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(moduleId)
+        return newSet
+      })
+    }
   }
 
   const handleSave = async () => {
@@ -223,7 +222,7 @@ export function CompanyModulesModal({ company, isOpen, onClose, onSave }: Compan
                   </div>
                   <div className="space-y-2">
                     <span className="font-medium text-muted-foreground">Segmento:</span>
-                    <Badge variant="secondary" className="text-sm px-3 py-1">{getFormattedSegment(company.segment)}</Badge>
+                    <p className="font-medium text-lg">{getFormattedSegment(company.segment)}</p>
                   </div>
                   <div className="space-y-2">
                     <span className="font-medium text-muted-foreground">Módulos Ativos:</span>
@@ -270,7 +269,7 @@ export function CompanyModulesModal({ company, isOpen, onClose, onSave }: Compan
                                     <p className="text-base text-muted-foreground leading-relaxed">{module.description}</p>
                                   )}
                                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                    <span>Compatível com: {getFormattedSegment(company.segment)}</span>
+                                    <span>Módulo disponível</span>
                                   </div>
                                 </div>
                               </div>
@@ -289,6 +288,7 @@ export function CompanyModulesModal({ company, isOpen, onClose, onSave }: Compan
                                 <Switch
                                   checked={enabled}
                                   onCheckedChange={(checked) => handleModuleToggle(module.id, checked)}
+                                  disabled={togglingModules.has(module.id)}
                                   className="scale-110"
                                 />
                               </div>

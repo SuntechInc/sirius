@@ -25,7 +25,6 @@ const createCompany = createServerAction(
 
 export const createCompanyAction = async (input: CreateCompanyData) => {
   try {
-    console.log('Dados sendo enviados para a API:', input)
     const result = await createCompany(input)
 
     if (result.success) {

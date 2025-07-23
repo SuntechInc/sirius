@@ -28,18 +28,6 @@ export function CompaniesTable({ data }: CompaniesTableProps) {
     setIsModulesModalOpen(true)
   }
 
-  const handleSaveModules = async (companyId: string, modules: TenantModule[]) => {
-    // Implement API call to save modules
-    console.log("Saving modules for company:", companyId, modules)
-
-    // Example API call:
-    // await fetch(`/api/companies/${companyId}/modules`, {
-    //   method: 'PUT',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ modules })
-    // })
-  }
-
   useEffect(() => {
     const handleManageModulesEvent = (event: CustomEvent) => {
       handleManageModules(event.detail)
@@ -63,7 +51,10 @@ export function CompaniesTable({ data }: CompaniesTableProps) {
           setIsModulesModalOpen(false)
           setSelectedCompany(null)
         }}
-        onSave={handleSaveModules}
+        onSave={async () => {
+          // Não é mais necessário - cada toggle já salva individualmente
+          console.log('Modal fechado - mudanças já foram salvas individualmente')
+        }}
       />
     </>
   )

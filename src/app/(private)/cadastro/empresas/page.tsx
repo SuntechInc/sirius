@@ -51,10 +51,6 @@ export default async function BranchesPage() {
           </div>
           <BranchCreateModal 
             onSubmit={async (data: CreateBranchData) => {
-              // TODO: Implementar chamada da API
-              console.log('Dados da filial:', data)
-              
-              // Simular delay da API
               await new Promise(resolve => setTimeout(resolve, 1000))
               
               return { success: true }

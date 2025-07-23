@@ -6,7 +6,7 @@ import { DataTableFacetedFilter } from '@/components/data-table/data-table-facet
 import { DataTableViewOptions } from '@/components/data-table/data-table-view-options'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { priorities, statuses } from './data'
+import { statuses } from './data'
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
@@ -35,13 +35,6 @@ export function DataTableToolbar<TData>({
             column={table.getColumn('status')}
             title="Status"
             options={statuses}
-          />
-        )}
-        {table.getColumn('priority') && (
-          <DataTableFacetedFilter
-            column={table.getColumn('priority')}
-            title="Priority"
-            options={priorities}
           />
         )}
         {isFiltered && (

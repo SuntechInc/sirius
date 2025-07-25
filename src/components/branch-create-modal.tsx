@@ -3,15 +3,20 @@
 import { PlusCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { CreateModal } from '@/components/ui/create-modal'
-import { branchCreateConfig } from '@/lib/configs/form-configs'
 import type { CreateBranchData } from '@/lib/configs/form-configs'
+import { branchCreateConfig } from '@/lib/configs/form-configs'
 
 interface BranchCreateModalProps {
   trigger?: React.ReactNode
-  onSubmit: (data: CreateBranchData) => Promise<{ success: boolean; error?: string }>
+  onSubmit: (
+    data: CreateBranchData
+  ) => Promise<{ success: boolean; error?: string }>
 }
 
-export function BranchCreateModal({ trigger, onSubmit }: BranchCreateModalProps) {
+export function BranchCreateModal({
+  trigger,
+  onSubmit,
+}: BranchCreateModalProps) {
   const defaultTrigger = (
     <Button>
       <PlusCircle className="mr-2 h-4 w-4" />
@@ -26,4 +31,4 @@ export function BranchCreateModal({ trigger, onSubmit }: BranchCreateModalProps)
       trigger={trigger || defaultTrigger}
     />
   )
-} 
+}

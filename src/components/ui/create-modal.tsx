@@ -1,10 +1,32 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
+import {
+  Briefcase,
+  Building2,
+  FileText,
+  Hash,
+  Info,
+  Mail,
+  MapPin,
+  Phone,
+  PlusCircle,
+  Users,
+} from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { PlusCircle, Info, Building2, Mail, Phone, Hash, Users, Briefcase, MapPin, FileText } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -14,25 +36,28 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Card, CardContent } from '@/components/ui/card'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
-import { CreateModalProps } from '@/types/form-config'
-import { toast } from 'sonner'
+import { Switch } from '@/components/ui/switch'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import type { CreateModalProps } from '@/types/form-config'
 
-export function CreateModal({ 
-  config, 
-  onSubmit, 
-  trigger, 
-  onSuccess 
+export function CreateModal({
+  config,
+  onSubmit,
+  trigger,
+  onSuccess,
 }: CreateModalProps) {
   const [open, setOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -44,10 +69,10 @@ export function CreateModal({
 
   async function handleSubmit(data: any) {
     setIsSubmitting(true)
-    
+
     try {
       const result = await onSubmit(data)
-      
+
       if (result.success) {
         toast.success(config.successMessage)
         setOpen(false)
@@ -93,14 +118,18 @@ export function CreateModal({
       classification: <Briefcase className="h-4 w-4 text-muted-foreground" />,
       status: <Users className="h-4 w-4 text-muted-foreground" />,
     }
-    return iconMap[sectionName] || <Building2 className="h-4 w-4 text-muted-foreground" />
+    return (
+      iconMap[sectionName] || (
+        <Building2 className="h-4 w-4 text-muted-foreground" />
+      )
+    )
   }
 
   const renderField = (field: any) => {
     const commonProps = {
       disabled: isSubmitting,
       placeholder: field.placeholder,
-      className: "h-10",
+      className: 'h-10',
     }
 
     const fieldIcon = getFieldIcon(field.name)
@@ -121,11 +150,7 @@ export function CreateModal({
                   {field.label}
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    type={field.type}
-                    {...commonProps}
-                    {...formField}
-                  />
+                  <Input type={field.type} {...commonProps} {...formField} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -145,10 +170,19 @@ export function CreateModal({
                   {fieldIcon}
                   {field.label}
                 </FormLabel>
-                <Select onValueChange={formField.onChange} defaultValue={formField.value} disabled={isSubmitting}>
+                <Select
+                  onValueChange={formField.onChange}
+                  defaultValue={formField.value}
+                  disabled={isSubmitting}
+                >
                   <FormControl>
                     <SelectTrigger className="h-10">
-                      <SelectValue placeholder={field.placeholder || `Selecione ${field.label.toLowerCase()}`} />
+                      <SelectValue
+                        placeholder={
+                          field.placeholder ||
+                          `Selecione ${field.label.toLowerCase()}`
+                        }
+                      />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -181,7 +215,9 @@ export function CreateModal({
                     </FormLabel>
                   </div>
                   {field.description && (
-                    <p className="text-xs text-muted-foreground">{field.description}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {field.description}
+                    </p>
                   )}
                 </div>
                 <FormControl>
@@ -228,7 +264,7 @@ export function CreateModal({
 
   const renderFieldWithTooltip = (field: any) => {
     const fieldElement = renderField(field)
-    
+
     if (field.tooltip) {
       return (
         <div key={field.name} className="flex items-center space-x-2">
@@ -258,13 +294,33 @@ export function CreateModal({
     }
 
     config.fields.forEach(field => {
-      if (field.name.includes('tradingName') || field.name.includes('legalName') || field.name.includes('taxId') || field.name.includes('taxCountry') || field.name.includes('code') || field.name.includes('name')) {
+      if (
+        field.name.includes('tradingName') ||
+        field.name.includes('legalName') ||
+        field.name.includes('taxId') ||
+        field.name.includes('taxCountry') ||
+        field.name.includes('code') ||
+        field.name.includes('name')
+      ) {
         sections.basic.push(field)
-      } else if (field.name.includes('email') || field.name.includes('phone') || field.name.includes('address') || field.name.includes('description')) {
+      } else if (
+        field.name.includes('email') ||
+        field.name.includes('phone') ||
+        field.name.includes('address') ||
+        field.name.includes('description')
+      ) {
         sections.contact.push(field)
-      } else if (field.name.includes('industry') || field.name.includes('segment')) {
+      } else if (
+        field.name.includes('industry') ||
+        field.name.includes('segment')
+      ) {
         sections.classification.push(field)
-      } else if (field.name.includes('status') || field.name.includes('isActive') || field.name.includes('isHeadquarter') || field.name.includes('managerId')) {
+      } else if (
+        field.name.includes('status') ||
+        field.name.includes('isActive') ||
+        field.name.includes('isHeadquarter') ||
+        field.name.includes('managerId')
+      ) {
         sections.status.push(field)
       } else {
         sections.basic.push(field)
@@ -292,14 +348,18 @@ export function CreateModal({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-      <DialogContent className={`max-w-4xl max-h-[90vh] overflow-y-auto ${config.className || ''}`}>
+      <DialogContent
+        className={`max-w-4xl max-h-[90vh] overflow-y-auto ${config.className || ''}`}
+      >
         <DialogHeader className="space-y-4">
           <div className="flex items-center gap-4">
             <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/20">
               <Building2 className="h-7 w-7 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <DialogTitle className="text-2xl font-semibold">{config.title}</DialogTitle>
+              <DialogTitle className="text-2xl font-semibold">
+                {config.title}
+              </DialogTitle>
               <DialogDescription className="text-sm text-muted-foreground">
                 {config.description}
               </DialogDescription>
@@ -308,7 +368,10 @@ export function CreateModal({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-8"
+          >
             {Object.entries(sections).map(([sectionKey, fields]) => {
               if (fields.length === 0) return null
 
@@ -317,23 +380,37 @@ export function CreateModal({
                   <CardContent className="pt-8">
                     <div className="flex items-center gap-3 mb-6">
                       {getSectionIcon(sectionKey)}
-                      <h3 className="font-medium text-lg">{sectionTitles[sectionKey as keyof typeof sectionTitles]}</h3>
+                      <h3 className="font-medium text-lg">
+                        {
+                          sectionTitles[
+                            sectionKey as keyof typeof sectionTitles
+                          ]
+                        }
+                      </h3>
                     </div>
 
                     <div className="grid gap-6">
                       {(() => {
                         const renderedFields: React.ReactNode[] = []
                         let currentGroup: any[] = []
-                        
+
                         fields.forEach((field: any, index: number) => {
                           if (field.gridCols === 2) {
                             currentGroup.push(field)
-                            
+
                             // Se temos 2 campos no grupo ou é o último campo, renderiza o grupo
-                            if (currentGroup.length === 2 || index === fields.length - 1) {
+                            if (
+                              currentGroup.length === 2 ||
+                              index === fields.length - 1
+                            ) {
                               renderedFields.push(
-                                <div key={`group-${index}`} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                  {currentGroup.map((groupField) => renderFieldWithTooltip(groupField))}
+                                <div
+                                  key={`group-${index}`}
+                                  className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                                >
+                                  {currentGroup.map(groupField =>
+                                    renderFieldWithTooltip(groupField)
+                                  )}
                                 </div>
                               )
                               currentGroup = []
@@ -342,13 +419,18 @@ export function CreateModal({
                             // Se temos campos no grupo atual, renderiza eles primeiro
                             if (currentGroup.length > 0) {
                               renderedFields.push(
-                                <div key={`group-${index}`} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                  {currentGroup.map((groupField) => renderFieldWithTooltip(groupField))}
+                                <div
+                                  key={`group-${index}`}
+                                  className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                                >
+                                  {currentGroup.map(groupField =>
+                                    renderFieldWithTooltip(groupField)
+                                  )}
                                 </div>
                               )
                               currentGroup = []
                             }
-                            
+
                             // Renderiza o campo individual
                             renderedFields.push(
                               <div key={field.name} className="space-y-2">
@@ -357,7 +439,7 @@ export function CreateModal({
                             )
                           }
                         })
-                        
+
                         return renderedFields
                       })()}
                     </div>
@@ -371,11 +453,15 @@ export function CreateModal({
         <Separator />
 
         <DialogFooter className="gap-2">
-          <Button variant="outline" onClick={() => setOpen(false)} disabled={isSubmitting}>
+          <Button
+            variant="outline"
+            onClick={() => setOpen(false)}
+            disabled={isSubmitting}
+          >
             Cancelar
           </Button>
-          <Button 
-            onClick={form.handleSubmit(handleSubmit)} 
+          <Button
+            onClick={form.handleSubmit(handleSubmit)}
             disabled={isSubmitting}
             className="bg-blue-600 hover:bg-blue-700"
           >
@@ -386,4 +472,4 @@ export function CreateModal({
       </DialogContent>
     </Dialog>
   )
-} 
+}

@@ -1,5 +1,3 @@
-
-
 // Enums
 export enum CompanyStatus {
   ACTIVE = 'ACTIVE',

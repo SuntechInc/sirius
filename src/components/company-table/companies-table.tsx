@@ -1,16 +1,16 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
-import { DataTable } from "@/components/data-table"
-import { columns } from "./columns"
-import { CompanyModulesModal } from "@/components/company-modules-modal"
-import type { Company } from "@/lib/queries/company"
+import { useEffect, useState } from 'react'
+import { CompanyModulesModal } from '@/components/company-modules-modal'
+import { DataTable } from '@/components/data-table'
+import type { Company } from '@/lib/queries/company'
+import { columns } from './columns'
 
 interface TenantModule {
   companyId: string
   moduleId: string
   segment: string
-  status: "ENABLED" | "DISABLED"
+  status: 'ENABLED' | 'DISABLED'
   enabledAt: string
   disabledAt?: string
 }
@@ -33,17 +33,23 @@ export function CompaniesTable({ data }: CompaniesTableProps) {
       handleManageModules(event.detail)
     }
 
-    window.addEventListener('manageModules', handleManageModulesEvent as EventListener)
+    window.addEventListener(
+      'manageModules',
+      handleManageModulesEvent as EventListener
+    )
 
     return () => {
-      window.removeEventListener('manageModules', handleManageModulesEvent as EventListener)
+      window.removeEventListener(
+        'manageModules',
+        handleManageModulesEvent as EventListener
+      )
     }
   }, [])
 
   return (
     <>
       <DataTable columns={columns} data={data} />
-      
+
       <CompanyModulesModal
         company={selectedCompany}
         isOpen={isModulesModalOpen}
@@ -53,9 +59,11 @@ export function CompaniesTable({ data }: CompaniesTableProps) {
         }}
         onSave={async () => {
           // Não é mais necessário - cada toggle já salva individualmente
-          console.log('Modal fechado - mudanças já foram salvas individualmente')
+          console.log(
+            'Modal fechado - mudanças já foram salvas individualmente'
+          )
         }}
       />
     </>
   )
-} 
+}

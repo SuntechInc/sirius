@@ -1,7 +1,13 @@
-import { ReactNode } from 'react'
-import { z } from 'zod'
+import type { ReactNode } from 'react'
+import type { z } from 'zod'
 
-export type FieldType = 'text' | 'email' | 'tel' | 'select' | 'switch' | 'textarea'
+export type FieldType =
+  | 'text'
+  | 'email'
+  | 'tel'
+  | 'select'
+  | 'switch'
+  | 'textarea'
 
 export interface SelectOption {
   value: string
@@ -39,4 +45,4 @@ export interface CreateModalProps<T = any> {
   onSubmit: (data: T) => Promise<{ success: boolean; error?: string }>
   trigger?: ReactNode
   onSuccess?: () => void
-} 
+}

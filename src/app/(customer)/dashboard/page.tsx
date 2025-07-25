@@ -1,4 +1,11 @@
-import { Briefcase, Building2, User, Users2, BarChart3, TrendingUp, Activity } from 'lucide-react'
+import {
+  Activity,
+  BarChart3,
+  Briefcase,
+  Building2,
+  User,
+  Users2,
+} from 'lucide-react'
 import Link from 'next/link'
 
 const quickActions = [
@@ -34,7 +41,7 @@ export default function DashboardPage() {
           Bem-vindo ao painel de controle do sistema
         </p>
       </div>
-      
+
       {/* Cards de estatísticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="bg-white p-6 rounded-lg shadow-sm border">
@@ -62,7 +69,9 @@ export default function DashboardPage() {
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-medium text-gray-500">Departamentos</h3>
+              <h3 className="text-sm font-medium text-gray-500">
+                Departamentos
+              </h3>
               <p className="text-2xl font-bold text-orange-600">45</p>
             </div>
             <Users2 className="h-8 w-8 text-orange-500" />
@@ -81,7 +90,9 @@ export default function DashboardPage() {
 
       {/* Ações rápidas */}
       <div className="mb-8">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Ações Rápidas</h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          Ações Rápidas
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {quickActions.map(item => (
             <Link key={item.title} href={item.url} className="group block">
@@ -107,21 +118,29 @@ export default function DashboardPage() {
 
       {/* Atividades recentes */}
       <div className="bg-white p-6 rounded-lg shadow-sm border">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Atividades Recentes</h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          Atividades Recentes
+        </h2>
         <div className="space-y-4">
           <div className="flex items-center space-x-3">
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <span className="text-sm text-gray-600">Novo funcionário cadastrado - João Silva</span>
+            <span className="text-sm text-gray-600">
+              Novo funcionário cadastrado - João Silva
+            </span>
             <span className="text-xs text-gray-400 ml-auto">2 min atrás</span>
           </div>
           <div className="flex items-center space-x-3">
             <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-            <span className="text-sm text-gray-600">Departamento "TI" atualizado</span>
+            <span className="text-sm text-gray-600">
+              Departamento "TI" atualizado
+            </span>
             <span className="text-xs text-gray-400 ml-auto">15 min atrás</span>
           </div>
           <div className="flex items-center space-x-3">
             <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-            <span className="text-sm text-gray-600">Nova filial criada - São Paulo</span>
+            <span className="text-sm text-gray-600">
+              Nova filial criada - São Paulo
+            </span>
             <span className="text-xs text-gray-400 ml-auto">1 hora atrás</span>
           </div>
         </div>

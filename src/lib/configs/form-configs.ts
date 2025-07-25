@@ -1,13 +1,18 @@
 import { z } from 'zod'
-import { Industry, Segment, CompanyStatus } from '@/types/enums'
 import { getFormattedIndustry, getFormattedSegment } from '@/lib/utils'
-import { FormConfig } from '@/types/form-config'
+import { CompanyStatus, Industry, Segment } from '@/types/enums'
+import type { FormConfig } from '@/types/form-config'
 
 // Schema para criação de empresas
 export const createCompanySchema = z.object({
-  tradingName: z.string().min(2, 'Nome fantasia deve ter pelo menos 2 caracteres'),
+  tradingName: z
+    .string()
+    .min(2, 'Nome fantasia deve ter pelo menos 2 caracteres'),
   legalName: z.string().min(2, 'Razão social deve ter pelo menos 2 caracteres'),
-  taxId: z.string().min(14, 'CNPJ deve ter 14 dígitos').max(18, 'CNPJ muito longo'),
+  taxId: z
+    .string()
+    .min(14, 'CNPJ deve ter 14 dígitos')
+    .max(18, 'CNPJ muito longo'),
   taxCountry: z.string().optional(),
   email: z.string().email('E-mail inválido'),
   phone: z.string().optional(),
@@ -128,9 +133,14 @@ export const companyCreateConfig: FormConfig<CreateCompanyData> = {
 // Schema para criação de filiais/unidades
 export const createBranchSchema = z.object({
   code: z.string().min(1, 'Código é obrigatório'),
-  tradingName: z.string().min(2, 'Nome fantasia deve ter pelo menos 2 caracteres'),
+  tradingName: z
+    .string()
+    .min(2, 'Nome fantasia deve ter pelo menos 2 caracteres'),
   legalName: z.string().min(2, 'Razão social deve ter pelo menos 2 caracteres'),
-  taxId: z.string().min(14, 'CNPJ deve ter 14 dígitos').max(18, 'CNPJ muito longo'),
+  taxId: z
+    .string()
+    .min(14, 'CNPJ deve ter 14 dígitos')
+    .max(18, 'CNPJ muito longo'),
   email: z.string().email('E-mail inválido'),
   phone: z.string().min(10, 'Telefone deve ter pelo menos 10 dígitos'),
   address: z.string().min(5, 'Endereço deve ter pelo menos 5 caracteres'),
@@ -293,4 +303,4 @@ export const departmentCreateConfig: FormConfig<CreateDepartmentData> = {
   successMessage: 'Departamento criado com sucesso!',
   errorMessage: 'Erro ao criar departamento. Tente novamente.',
   className: 'sm:max-w-[600px]',
-} 
+}

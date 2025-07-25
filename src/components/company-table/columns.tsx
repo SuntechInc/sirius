@@ -1,7 +1,7 @@
 'use client'
 
 import type { ColumnDef } from '@tanstack/react-table'
-import { MoreHorizontal, Settings, Eye, Edit } from 'lucide-react'
+import { Edit, Eye, MoreHorizontal, Settings } from 'lucide-react'
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header'
 import { Button } from '@/components/ui/button'
 import {
@@ -131,16 +131,28 @@ export const columns: ColumnDef<Company>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Ações</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => window.dispatchEvent(new CustomEvent('manageModules', { detail: company }))}>
+            <DropdownMenuItem
+              onClick={() =>
+                window.dispatchEvent(
+                  new CustomEvent('manageModules', { detail: company })
+                )
+              }
+            >
               <Settings className="mr-2 h-4 w-4" />
               Gerenciar Módulos
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(company.id)}>
+            <DropdownMenuItem
+              onClick={() => navigator.clipboard.writeText(company.id)}
+            >
               <Eye className="mr-2 h-4 w-4" />
               Copiar ID
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => window.open(`/admin/empresas/${company.id}/editar`, '_blank')}>
+            <DropdownMenuItem
+              onClick={() =>
+                window.open(`/admin/empresas/${company.id}/editar`, '_blank')
+              }
+            >
               <Edit className="mr-2 h-4 w-4" />
               Editar
             </DropdownMenuItem>

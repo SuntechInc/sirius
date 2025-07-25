@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -41,4 +41,4 @@ export function DialogWrapper({
       </DialogContent>
     </Dialog>
   )
-} 
+}

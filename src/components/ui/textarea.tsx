@@ -19,4 +19,4 @@ function Textarea({ className, ...props }: TextareaProps) {
   )
 }
 
-export { Textarea } 
+export { Textarea }

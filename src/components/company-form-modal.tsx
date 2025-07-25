@@ -1,10 +1,11 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Info, PlusCircle, Search, User } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
 import { z } from 'zod'
-import { PlusCircle, Info, Search, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -23,7 +24,13 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import {
   Tooltip,
@@ -31,10 +38,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { toast } from 'sonner'
 
 const companySchema = z.object({
-  taxId: z.string().min(14, 'CNPJ deve ter 14 dígitos').max(18, 'CNPJ muito longo'),
+  taxId: z
+    .string()
+    .min(14, 'CNPJ deve ter 14 dígitos')
+    .max(18, 'CNPJ muito longo'),
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
   code: z.string().min(1, 'Código é obrigatório'),
   email: z.string().email('E-mail inválido'),
@@ -48,10 +57,30 @@ type CompanyFormData = z.infer<typeof companySchema>
 
 // TODO: Implementar busca de funcionários na API
 const mockEmployees = [
-  { id: '1', name: 'João Silva', email: 'joao.silva@empresa.com', position: 'Gerente' },
-  { id: '2', name: 'Maria Santos', email: 'maria.santos@empresa.com', position: 'Supervisor' },
-  { id: '3', name: 'Pedro Costa', email: 'pedro.costa@empresa.com', position: 'Coordenador' },
-  { id: '4', name: 'Ana Oliveira', email: 'ana.oliveira@empresa.com', position: 'Diretor' },
+  {
+    id: '1',
+    name: 'João Silva',
+    email: 'joao.silva@empresa.com',
+    position: 'Gerente',
+  },
+  {
+    id: '2',
+    name: 'Maria Santos',
+    email: 'maria.santos@empresa.com',
+    position: 'Supervisor',
+  },
+  {
+    id: '3',
+    name: 'Pedro Costa',
+    email: 'pedro.costa@empresa.com',
+    position: 'Coordenador',
+  },
+  {
+    id: '4',
+    name: 'Ana Oliveira',
+    email: 'ana.oliveira@empresa.com',
+    position: 'Diretor',
+  },
 ]
 
 export function CompanyFormModal() {
@@ -74,21 +103,22 @@ export function CompanyFormModal() {
   })
 
   // TODO: Implementar busca na API de funcionários
-  const filteredEmployees = mockEmployees.filter(employee =>
-    employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    employee.email.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredEmployees = mockEmployees.filter(
+    employee =>
+      employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      employee.email.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   async function onSubmit(data: CompanyFormData) {
     setIsSubmitting(true)
-    
+
     try {
       // TODO: Implementar chamada da API
       console.log('Dados do formulário:', data)
-      
+
       // Simular delay da API
       await new Promise(resolve => setTimeout(resolve, 1000))
-      
+
       toast.success('Empresa cadastrada com sucesso!')
       setOpen(false)
       form.reset()
@@ -115,7 +145,7 @@ export function CompanyFormModal() {
             Preencha os dados da empresa para cadastrá-la no sistema.
           </DialogDescription>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -136,7 +166,7 @@ export function CompanyFormModal() {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="code"
@@ -193,7 +223,7 @@ export function CompanyFormModal() {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="phone"
@@ -225,7 +255,7 @@ export function CompanyFormModal() {
                       <Input
                         placeholder="Buscar funcionário..."
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onChange={e => setSearchTerm(e.target.value)}
                         className="pl-10"
                         disabled={isSubmitting}
                       />
@@ -233,7 +263,7 @@ export function CompanyFormModal() {
                     {searchTerm && (
                       <div className="border rounded-md max-h-48 overflow-y-auto">
                         {filteredEmployees.length > 0 ? (
-                          filteredEmployees.map((employee) => (
+                          filteredEmployees.map(employee => (
                             <div
                               key={employee.id}
                               className="flex items-center space-x-3 p-3 hover:bg-muted cursor-pointer border-b last:border-b-0"
@@ -244,7 +274,9 @@ export function CompanyFormModal() {
                             >
                               <User className="h-4 w-4 text-muted-foreground" />
                               <div className="flex-1">
-                                <div className="font-medium">{employee.name}</div>
+                                <div className="font-medium">
+                                  {employee.name}
+                                </div>
                                 <div className="text-sm text-muted-foreground">
                                   {employee.position} • {employee.email}
                                 </div>
@@ -271,7 +303,11 @@ export function CompanyFormModal() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={isSubmitting}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione o status" />
@@ -286,7 +322,7 @@ export function CompanyFormModal() {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="isHeadquarter"
@@ -335,4 +371,4 @@ export function CompanyFormModal() {
       </DialogContent>
     </Dialog>
   )
-} 
+}

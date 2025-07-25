@@ -1,7 +1,7 @@
 import { pipe } from 'effect'
 import { z } from 'zod'
-import { CompaniesTable } from '@/components/company-table/companies-table'
 import { CompanyCreateModal } from '@/components/company-create-modal'
+import { CompaniesTable } from '@/components/company-table/companies-table'
 import { ApiClient } from '@/lib/effect/api-client'
 import { runEffect } from '@/lib/effect/utils'
 import { companySchema } from '@/lib/queries/company'
@@ -38,7 +38,9 @@ export default async function CompaniesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Empresas</h1>
-          <p className="text-muted-foreground">Gerenciamento de todas as empresas</p>
+          <p className="text-muted-foreground">
+            Gerenciamento de todas as empresas
+          </p>
         </div>
         <CompanyCreateModal />
       </div>

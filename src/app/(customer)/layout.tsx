@@ -6,7 +6,7 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar'
 
-export default async function Layout({
+export default async function CustomerLayout({
   children,
 }: {
   children: React.ReactNode

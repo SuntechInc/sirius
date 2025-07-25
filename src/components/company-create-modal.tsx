@@ -3,9 +3,9 @@
 import { PlusCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { CreateModal } from '@/components/ui/create-modal'
-import { companyCreateConfig } from '@/lib/configs/form-configs'
 import { createCompanyAction } from '@/lib/actions/company'
 import type { CreateCompanyData } from '@/lib/configs/form-configs'
+import { companyCreateConfig } from '@/lib/configs/form-configs'
 
 interface CompanyCreateModalProps {
   trigger?: React.ReactNode
@@ -31,4 +31,4 @@ export function CompanyCreateModal({ trigger }: CompanyCreateModalProps) {
       trigger={trigger || defaultTrigger}
     />
   )
-} 
+}

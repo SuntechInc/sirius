@@ -1,13 +1,13 @@
 import { pipe } from 'effect'
 import { z } from 'zod'
+import { BranchCreateModal } from '@/components/branch-create-modal'
 import { branchColumns } from '@/components/company-table/branch-columns'
 import { DataTable } from '@/components/data-table'
-import { BranchCreateModal } from '@/components/branch-create-modal'
+import type { CreateBranchData } from '@/lib/configs/form-configs'
 import { ApiClient } from '@/lib/effect/api-client'
 import { runEffect } from '@/lib/effect/utils'
 import { branchSchema } from '@/lib/queries/branch'
 import { getUser } from '@/lib/session'
-import type { CreateBranchData } from '@/lib/configs/form-configs'
 
 export default async function BranchesPage() {
   const user = await getUser()
@@ -49,10 +49,10 @@ export default async function BranchesPage() {
               Gerencie as empresas e filiais do sistema
             </p>
           </div>
-          <BranchCreateModal 
+          <BranchCreateModal
             onSubmit={async (data: CreateBranchData) => {
               await new Promise(resolve => setTimeout(resolve, 1000))
-              
+
               return { success: true }
             }}
           />

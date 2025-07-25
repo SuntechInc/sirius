@@ -24,4 +24,4 @@ export const companyModuleSchema = z.object({
 })
 
 export type Module = z.infer<typeof moduleSchema>
-export type CompanyModule = z.infer<typeof companyModuleSchema> 
+export type CompanyModule = z.infer<typeof companyModuleSchema>

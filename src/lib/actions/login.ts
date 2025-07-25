@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import { ApiClient } from '@/lib/effect/api-client'
 import { createServerAction } from '@/lib/effect/server-action'
-import { getUser, saveSession } from '@/lib/session'
+import { getCachedUser, saveSession } from '@/lib/session'
 import type { AuthSchema } from '@/lib/validations/auth'
 import { UserType } from '@/types/enums'
 
@@ -56,7 +56,7 @@ export const loginAction = async (input: AuthSchema) => {
 
   await saveSession(accessToken)
 
-  const { userType } = await getUser()
+  const { userType } = await getCachedUser()
 
   if (userType !== UserType.GLOBAL_ADMIN) {
     revalidatePath('/dashboard', 'layout')

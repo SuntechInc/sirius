@@ -4,6 +4,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import type { UserType } from '@/types/enums'
 import 'server-only'
+import { cache } from 'react'
 
 export type User = {
   sub: string
@@ -44,7 +45,7 @@ export async function destroySession() {
   session.destroy()
 }
 
-export async function getUser() {
+export const getCachedUser = cache(async () => {
   const session = await getSession()
 
   if (!session.token) {
@@ -52,4 +53,4 @@ export async function getUser() {
   }
 
   return jwt.decode(session.token) as unknown as User
-}
+})

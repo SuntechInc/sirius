@@ -1,6 +1,7 @@
 import axios, { type AxiosInstance } from 'axios'
+
 import { ApiError, NetworkError } from '@/types/api'
-import { getSession } from './session'
+import { destroySession, getSession } from './session'
 
 export const createHttpClient = (baseURL: string): AxiosInstance => {
   const client = axios.create({
@@ -21,14 +22,17 @@ export const createHttpClient = (baseURL: string): AxiosInstance => {
       }
       return config
     },
-    error => Promise.reject(error)
+    async error => Promise.reject(error)
   )
 
   // Interceptor para responses
   client.interceptors.response.use(
     response => response,
-    error => {
+    async error => {
       if (error.response) {
+        if (error.response.status === 401) {
+          await destroySession()
+        }
         // Erro com resposta do servidor
         throw new ApiError(
           error.response.data?.message || 'Erro na API',

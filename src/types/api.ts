@@ -1,5 +1,5 @@
 import type { AxiosError } from 'axios'
-import { Effect, pipe } from 'effect'
+
 import { z } from 'zod'
 
 export const ApiResponseSchema = z.object({
@@ -38,6 +38,8 @@ export class ValidationError extends Error {
 }
 
 export class ApiError extends Error {
+  readonly _tag = 'ApiError'
+
   constructor(
     message: string,
     public status: number,
@@ -49,6 +51,8 @@ export class ApiError extends Error {
 }
 
 export class NetworkError extends Error {
+  readonly _tag = 'NetworkError'
+
   constructor(
     message: string,
     public originalError: AxiosError

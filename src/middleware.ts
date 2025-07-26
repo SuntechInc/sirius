@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken'
 import { type NextRequest, NextResponse } from 'next/server'
-import { getSession, type User } from './lib/session'
 import { UserType } from './types/enums'
 
 const PUBLIC_ROUTES = ['/login', '/']

@@ -1,7 +1,8 @@
-import type { AxiosRequestConfig } from 'axios'
+import axios, { type AxiosRequestConfig } from 'axios'
 import { Effect, pipe } from 'effect'
 import type { z } from 'zod'
 import { createHttpClient } from '@/lib/api'
+import { ApiError, NetworkError } from '@/types/api'
 import { validateSchema } from './utils'
 
 export class ApiClient {
@@ -15,14 +16,25 @@ export class ApiClient {
     return pipe(
       Effect.tryPromise({
         try: () => this.client.get(url, config),
-        catch: unknown => new Error(`${unknown}`),
+        catch: error => {
+          if (axios.isAxiosError(error)) {
+            if (error.response) {
+              return new ApiError(
+                error.response.data?.message || error.message,
+                error.response.status,
+                error.response.data?.code
+              )
+            }
+            return new NetworkError(error.message, error)
+          }
+          return new Error(`${error}`)
+        },
       }),
       Effect.map(response => response.data),
       Effect.flatMap(validateSchema(responseSchema))
     )
   }
 
-  // POST com validação
   post<T, D>(
     url: string,
     data: D,
@@ -36,7 +48,19 @@ export class ApiClient {
         pipe(
           Effect.tryPromise({
             try: () => this.client.post(url, validatedData, config),
-            catch: unknown => new Error(`${unknown}`),
+            catch: error => {
+              if (axios.isAxiosError(error)) {
+                if (error.response) {
+                  return new ApiError(
+                    error.response.data?.message || error.message,
+                    error.response.status,
+                    error.response.data?.code
+                  )
+                }
+                return new NetworkError(error.message, error)
+              }
+              return new Error(`${error}`)
+            },
           }),
           Effect.map(response => response.data),
           Effect.flatMap(validateSchema(responseSchema))
@@ -45,7 +69,6 @@ export class ApiClient {
     )
   }
 
-  // PUT com validação
   put<T, D>(
     url: string,
     data: D,
@@ -59,7 +82,19 @@ export class ApiClient {
         pipe(
           Effect.tryPromise({
             try: () => this.client.put(url, validatedData, config),
-            catch: unknown => new Error(`${unknown}`),
+            catch: error => {
+              if (axios.isAxiosError(error)) {
+                if (error.response) {
+                  return new ApiError(
+                    error.response.data?.message || error.message,
+                    error.response.status,
+                    error.response.data?.code
+                  )
+                }
+                return new NetworkError(error.message, error)
+              }
+              return new Error(`${error}`)
+            },
           }),
           Effect.map(response => response.data),
           Effect.flatMap(validateSchema(responseSchema))
@@ -68,7 +103,6 @@ export class ApiClient {
     )
   }
 
-  // DELETE com validação
   delete<T>(
     url: string,
     responseSchema: z.ZodSchema<T>,
@@ -76,8 +110,20 @@ export class ApiClient {
   ): Effect.Effect<T, Error> {
     return pipe(
       Effect.tryPromise({
-        try: () => this.client.put(url, config),
-        catch: unknown => new Error(`${unknown}`),
+        try: () => this.client.delete(url, config),
+        catch: error => {
+          if (axios.isAxiosError(error)) {
+            if (error.response) {
+              return new ApiError(
+                error.response.data?.message || error.message,
+                error.response.status,
+                error.response.data?.code
+              )
+            }
+            return new NetworkError(error.message, error)
+          }
+          return new Error(`${error}`)
+        },
       }),
       Effect.map(response => response.data),
       Effect.flatMap(validateSchema(responseSchema))

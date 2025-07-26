@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Trash } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import type { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -12,27 +12,13 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { getCompanyStatus } from '@/lib/utils'
-import { CompanyStatus } from '@/types/enums'
+import { Switch } from '@/components/ui/switch'
+import { createBranchSchema } from '../_validations/create-branch-schema'
 
-const formSchema = z.object({
-  taxId: z.string(),
-  name: z.string(),
-  code: z.string(),
-  email: z.string().email(),
-  phone: z.string(),
-  responsible: z.string(),
-  isHeadquarter: z.boolean().default(false),
-  status: z.nativeEnum(CompanyStatus),
-  companyId: z.string(),
-  addressId: z.string(),
+const formSchema = createBranchSchema.omit({
+  companyId: true,
+  status: true,
+  addressId: true,
 })
 
 type FormValues = z.input<typeof formSchema>
@@ -121,38 +107,31 @@ export function CompanyForm({
           )}
         />
         <FormField
-          name="status"
+          name="code"
           control={form.control}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Status</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecione o status" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value={CompanyStatus.ACTIVE}>
-                    {getCompanyStatus(CompanyStatus.ACTIVE)}
-                  </SelectItem>
-                  <SelectItem value={CompanyStatus.CANCELLED}>
-                    {getCompanyStatus(CompanyStatus.CANCELLED)}
-                  </SelectItem>
-                  <SelectItem value={CompanyStatus.CLOSED}>
-                    {getCompanyStatus(CompanyStatus.CLOSED)}
-                  </SelectItem>
-                  <SelectItem value={CompanyStatus.INACTIVE}>
-                    {getCompanyStatus(CompanyStatus.INACTIVE)}
-                  </SelectItem>
-                  <SelectItem value={CompanyStatus.SUSPENDED}>
-                    {getCompanyStatus(CompanyStatus.SUSPENDED)}
-                  </SelectItem>
-                  <SelectItem value={CompanyStatus.TRIAL}>
-                    {getCompanyStatus(CompanyStatus.TRIAL)}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+              <FormLabel>Código</FormLabel>
+              <FormControl>
+                <Input
+                  disabled={disabled}
+                  placeholder="Código da empresa"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          name="taxId"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>CNPJ</FormLabel>
+              <FormControl>
+                <Input disabled={disabled} placeholder="CNPJ" {...field} />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
@@ -171,6 +150,23 @@ export function CompanyForm({
                 />
               </FormControl>
               <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          name="isHeadquarter"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+              <div className="space-y-0.5">
+                <FormLabel>É filial</FormLabel>
+              </div>
+              <FormControl>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
             </FormItem>
           )}
         />

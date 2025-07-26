@@ -5,19 +5,9 @@ import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { ApiClient } from '@/lib/effect/api-client'
 import { createServerAction } from '@/lib/effect/server-action'
+import { getCachedUser } from '@/lib/session'
 import { CompanyStatus } from '@/types/enums'
-
-const createBranchSchema = z.object({
-  taxId: z.string(),
-  name: z.string(),
-  code: z.string(),
-  email: z.string().email(),
-  phone: z.string(),
-  responsible: z.string(),
-  isHeadquarter: z.boolean().default(false),
-  status: z.nativeEnum(CompanyStatus),
-  addressId: z.string(),
-})
+import { createBranchSchema } from '../_validations/create-branch-schema'
 
 const createBranch = createServerAction(createBranchSchema, input => {
   const apiClient = new ApiClient()
@@ -25,14 +15,26 @@ const createBranch = createServerAction(createBranchSchema, input => {
   return pipe(apiClient.post('/branches', input, z.any()))
 })
 
-export const createBranchAction = async (
-  input: z.infer<typeof createBranchSchema>
-) => {
-  const result = await createBranch(input)
+const formSchema = createBranchSchema.omit({
+  companyId: true,
+  status: true,
+  addressId: true,
+})
+
+export const createBranchAction = async (input: z.infer<typeof formSchema>) => {
+  const { companyId } = await getCachedUser()
+
+  const result = await createBranch({
+    ...input,
+    companyId,
+    status: CompanyStatus.ACTIVE,
+    addressId: 'sahsadsdsf',
+  })
 
   if (!result.success) {
     return result
   }
 
   revalidatePath('/cadastro/empresas')
+  return result
 }

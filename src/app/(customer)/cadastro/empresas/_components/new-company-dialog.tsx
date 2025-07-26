@@ -1,5 +1,6 @@
 import { useTransition } from 'react'
-import { z } from 'zod'
+import { toast } from 'sonner'
+import type { z } from 'zod'
 import {
   Dialog,
   DialogContent,
@@ -7,21 +8,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { CompanyStatus } from '@/types/enums'
 import { createBranchAction } from '../_actions/create-branch'
 import { useNewCompany } from '../_hooks/use-new-company'
+import { createBranchSchema } from '../_validations/create-branch-schema'
 import { CompanyForm } from './company-form'
 
-const formSchema = z.object({
-  taxId: z.string(),
-  name: z.string(),
-  code: z.string(),
-  email: z.string().email(),
-  phone: z.string(),
-  responsible: z.string(),
-  isHeadquarter: z.boolean().default(false),
-  status: z.nativeEnum(CompanyStatus),
-  addressId: z.string(),
+const formSchema = createBranchSchema.omit({
+  companyId: true,
+  status: true,
+  addressId: true,
 })
 
 type FormValues = z.input<typeof formSchema>
@@ -32,10 +27,14 @@ export function NewCompanyDialog() {
 
   function onSubmit(values: FormValues) {
     startTransition(async () => {
-      await createBranchAction({
+      const result = await createBranchAction({
         ...values,
         isHeadquarter: values.isHeadquarter || false,
       })
+
+      if (!result.success) {
+        toast.error(result.error)
+      }
     })
   }
 
@@ -55,9 +54,6 @@ export function NewCompanyDialog() {
             phone: '',
             code: '',
             responsible: '',
-            addressId: '',
-            companyId: '',
-            status: CompanyStatus.ACTIVE,
             taxId: '',
             isHeadquarter: false,
           }}

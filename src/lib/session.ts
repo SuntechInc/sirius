@@ -15,7 +15,8 @@ export type User = {
   iat: number
   exp: number
 }
-const secret = process.env.JWT_SECRET || '12345678901234567890123456789012' //env var
+export const secret =
+  process.env.JWT_SECRET || '12345678901234567890123456789012' //env var
 const ttl = 60 * 60 * 24 * 7
 
 export async function getSession() {

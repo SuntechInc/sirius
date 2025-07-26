@@ -40,7 +40,7 @@ export interface FormConfig<T = any> {
   className?: string
 }
 
-export interface CreateModalProps<T = any> {
+export interface CreateModalProps<T = unknown> {
   config: FormConfig<T>
   onSubmit: (data: T) => Promise<{ success: boolean; error?: string }>
   trigger?: ReactNode

@@ -19,7 +19,7 @@ export const Route = createFileRoute("/_auth/login")({
   }),
   beforeLoad: ({ context }) => {
     if (context.auth.isAuthenticated) {
-      throw redirect({ to: "/dashboard" });
+      throw redirect({ to: "/" });
     }
   },
   component: LoginComponent,

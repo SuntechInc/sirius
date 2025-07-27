@@ -9,29 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './pages/__root'
-import { Route as AuthLayoutRouteImport } from './pages/_auth/layout'
 import { Route as AppLayoutRouteImport } from './pages/_app/layout'
-import { Route as PublicIndexRouteImport } from './pages/_public/index'
+import { Route as AppIndexRouteImport } from './pages/_app/index'
 import { Route as PublicTermosRouteImport } from './pages/_public/termos'
 import { Route as PublicPrivacidadeRouteImport } from './pages/_public/privacidade'
 import { Route as AuthLoginRouteImport } from './pages/_auth/login'
-import { Route as AppDashboardLayoutRouteImport } from './pages/_app/dashboard/layout'
-import { Route as AppAdminLayoutRouteImport } from './pages/_app/admin/layout'
-import { Route as AppDashboardIndexRouteImport } from './pages/_app/dashboard/index'
-import { Route as AppAdminIndexRouteImport } from './pages/_app/admin/index'
+import { Route as AdminAdminLayoutRouteImport } from './pages/_admin/admin/layout'
+import { Route as AppCadastroIndexRouteImport } from './pages/_app/cadastro/index'
+import { Route as AdminAdminIndexRouteImport } from './pages/_admin/admin/index'
+import { Route as AppCadastroEmpresasRouteImport } from './pages/_app/cadastro/empresas'
 
-const AuthLayoutRoute = AuthLayoutRouteImport.update({
-  id: '/_auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AppLayoutRoute = AppLayoutRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PublicIndexRoute = PublicIndexRouteImport.update({
-  id: '/_public/',
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AppLayoutRoute,
 } as any)
 const PublicTermosRoute = PublicTermosRouteImport.update({
   id: '/_public/termos',
@@ -44,106 +39,105 @@ const PublicPrivacidadeRoute = PublicPrivacidadeRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
-  id: '/login',
+  id: '/_auth/login',
   path: '/login',
-  getParentRoute: () => AuthLayoutRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AppDashboardLayoutRoute = AppDashboardLayoutRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AppLayoutRoute,
-} as any)
-const AppAdminLayoutRoute = AppAdminLayoutRouteImport.update({
-  id: '/admin',
+const AdminAdminLayoutRoute = AdminAdminLayoutRouteImport.update({
+  id: '/_admin/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppCadastroIndexRoute = AppCadastroIndexRouteImport.update({
+  id: '/cadastro/',
+  path: '/cadastro/',
   getParentRoute: () => AppLayoutRoute,
 } as any)
-const AppDashboardIndexRoute = AppDashboardIndexRouteImport.update({
+const AdminAdminIndexRoute = AdminAdminIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AppDashboardLayoutRoute,
+  getParentRoute: () => AdminAdminLayoutRoute,
 } as any)
-const AppAdminIndexRoute = AppAdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AppAdminLayoutRoute,
+const AppCadastroEmpresasRoute = AppCadastroEmpresasRouteImport.update({
+  id: '/cadastro/empresas',
+  path: '/cadastro/empresas',
+  getParentRoute: () => AppLayoutRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/admin': typeof AppAdminLayoutRouteWithChildren
-  '/dashboard': typeof AppDashboardLayoutRouteWithChildren
+  '/admin': typeof AdminAdminLayoutRouteWithChildren
   '/login': typeof AuthLoginRoute
   '/privacidade': typeof PublicPrivacidadeRoute
   '/termos': typeof PublicTermosRoute
-  '/': typeof PublicIndexRoute
-  '/admin/': typeof AppAdminIndexRoute
-  '/dashboard/': typeof AppDashboardIndexRoute
+  '/': typeof AppIndexRoute
+  '/cadastro/empresas': typeof AppCadastroEmpresasRoute
+  '/admin/': typeof AdminAdminIndexRoute
+  '/cadastro': typeof AppCadastroIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
   '/privacidade': typeof PublicPrivacidadeRoute
   '/termos': typeof PublicTermosRoute
-  '/': typeof PublicIndexRoute
-  '/admin': typeof AppAdminIndexRoute
-  '/dashboard': typeof AppDashboardIndexRoute
+  '/': typeof AppIndexRoute
+  '/cadastro/empresas': typeof AppCadastroEmpresasRoute
+  '/admin': typeof AdminAdminIndexRoute
+  '/cadastro': typeof AppCadastroIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppLayoutRouteWithChildren
-  '/_auth': typeof AuthLayoutRouteWithChildren
-  '/_app/admin': typeof AppAdminLayoutRouteWithChildren
-  '/_app/dashboard': typeof AppDashboardLayoutRouteWithChildren
+  '/_admin/admin': typeof AdminAdminLayoutRouteWithChildren
   '/_auth/login': typeof AuthLoginRoute
   '/_public/privacidade': typeof PublicPrivacidadeRoute
   '/_public/termos': typeof PublicTermosRoute
-  '/_public/': typeof PublicIndexRoute
-  '/_app/admin/': typeof AppAdminIndexRoute
-  '/_app/dashboard/': typeof AppDashboardIndexRoute
+  '/_app/': typeof AppIndexRoute
+  '/_app/cadastro/empresas': typeof AppCadastroEmpresasRoute
+  '/_admin/admin/': typeof AdminAdminIndexRoute
+  '/_app/cadastro/': typeof AppCadastroIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/admin'
-    | '/dashboard'
     | '/login'
     | '/privacidade'
     | '/termos'
     | '/'
+    | '/cadastro/empresas'
     | '/admin/'
-    | '/dashboard/'
+    | '/cadastro'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/privacidade' | '/termos' | '/' | '/admin' | '/dashboard'
+  to:
+    | '/login'
+    | '/privacidade'
+    | '/termos'
+    | '/'
+    | '/cadastro/empresas'
+    | '/admin'
+    | '/cadastro'
   id:
     | '__root__'
     | '/_app'
-    | '/_auth'
-    | '/_app/admin'
-    | '/_app/dashboard'
+    | '/_admin/admin'
     | '/_auth/login'
     | '/_public/privacidade'
     | '/_public/termos'
-    | '/_public/'
-    | '/_app/admin/'
-    | '/_app/dashboard/'
+    | '/_app/'
+    | '/_app/cadastro/empresas'
+    | '/_admin/admin/'
+    | '/_app/cadastro/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AppLayoutRoute: typeof AppLayoutRouteWithChildren
-  AuthLayoutRoute: typeof AuthLayoutRouteWithChildren
+  AdminAdminLayoutRoute: typeof AdminAdminLayoutRouteWithChildren
+  AuthLoginRoute: typeof AuthLoginRoute
   PublicPrivacidadeRoute: typeof PublicPrivacidadeRoute
   PublicTermosRoute: typeof PublicTermosRoute
-  PublicIndexRoute: typeof PublicIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/_auth': {
-      id: '/_auth'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof AuthLayoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_app': {
       id: '/_app'
       path: ''
@@ -151,12 +145,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppLayoutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_public/': {
-      id: '/_public/'
+    '/_app/': {
+      id: '/_app/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof PublicIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppLayoutRoute
     }
     '/_public/termos': {
       id: '/_public/termos'
@@ -177,94 +171,72 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof AuthLoginRouteImport
-      parentRoute: typeof AuthLayoutRoute
+      parentRoute: typeof rootRouteImport
     }
-    '/_app/dashboard': {
-      id: '/_app/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AppDashboardLayoutRouteImport
-      parentRoute: typeof AppLayoutRoute
-    }
-    '/_app/admin': {
-      id: '/_app/admin'
+    '/_admin/admin': {
+      id: '/_admin/admin'
       path: '/admin'
       fullPath: '/admin'
-      preLoaderRoute: typeof AppAdminLayoutRouteImport
+      preLoaderRoute: typeof AdminAdminLayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/cadastro/': {
+      id: '/_app/cadastro/'
+      path: '/cadastro'
+      fullPath: '/cadastro'
+      preLoaderRoute: typeof AppCadastroIndexRouteImport
       parentRoute: typeof AppLayoutRoute
     }
-    '/_app/dashboard/': {
-      id: '/_app/dashboard/'
-      path: '/'
-      fullPath: '/dashboard/'
-      preLoaderRoute: typeof AppDashboardIndexRouteImport
-      parentRoute: typeof AppDashboardLayoutRoute
-    }
-    '/_app/admin/': {
-      id: '/_app/admin/'
+    '/_admin/admin/': {
+      id: '/_admin/admin/'
       path: '/'
       fullPath: '/admin/'
-      preLoaderRoute: typeof AppAdminIndexRouteImport
-      parentRoute: typeof AppAdminLayoutRoute
+      preLoaderRoute: typeof AdminAdminIndexRouteImport
+      parentRoute: typeof AdminAdminLayoutRoute
+    }
+    '/_app/cadastro/empresas': {
+      id: '/_app/cadastro/empresas'
+      path: '/cadastro/empresas'
+      fullPath: '/cadastro/empresas'
+      preLoaderRoute: typeof AppCadastroEmpresasRouteImport
+      parentRoute: typeof AppLayoutRoute
     }
   }
 }
 
-interface AppAdminLayoutRouteChildren {
-  AppAdminIndexRoute: typeof AppAdminIndexRoute
-}
-
-const AppAdminLayoutRouteChildren: AppAdminLayoutRouteChildren = {
-  AppAdminIndexRoute: AppAdminIndexRoute,
-}
-
-const AppAdminLayoutRouteWithChildren = AppAdminLayoutRoute._addFileChildren(
-  AppAdminLayoutRouteChildren,
-)
-
-interface AppDashboardLayoutRouteChildren {
-  AppDashboardIndexRoute: typeof AppDashboardIndexRoute
-}
-
-const AppDashboardLayoutRouteChildren: AppDashboardLayoutRouteChildren = {
-  AppDashboardIndexRoute: AppDashboardIndexRoute,
-}
-
-const AppDashboardLayoutRouteWithChildren =
-  AppDashboardLayoutRoute._addFileChildren(AppDashboardLayoutRouteChildren)
-
 interface AppLayoutRouteChildren {
-  AppAdminLayoutRoute: typeof AppAdminLayoutRouteWithChildren
-  AppDashboardLayoutRoute: typeof AppDashboardLayoutRouteWithChildren
+  AppIndexRoute: typeof AppIndexRoute
+  AppCadastroEmpresasRoute: typeof AppCadastroEmpresasRoute
+  AppCadastroIndexRoute: typeof AppCadastroIndexRoute
 }
 
 const AppLayoutRouteChildren: AppLayoutRouteChildren = {
-  AppAdminLayoutRoute: AppAdminLayoutRouteWithChildren,
-  AppDashboardLayoutRoute: AppDashboardLayoutRouteWithChildren,
+  AppIndexRoute: AppIndexRoute,
+  AppCadastroEmpresasRoute: AppCadastroEmpresasRoute,
+  AppCadastroIndexRoute: AppCadastroIndexRoute,
 }
 
 const AppLayoutRouteWithChildren = AppLayoutRoute._addFileChildren(
   AppLayoutRouteChildren,
 )
 
-interface AuthLayoutRouteChildren {
-  AuthLoginRoute: typeof AuthLoginRoute
+interface AdminAdminLayoutRouteChildren {
+  AdminAdminIndexRoute: typeof AdminAdminIndexRoute
 }
 
-const AuthLayoutRouteChildren: AuthLayoutRouteChildren = {
-  AuthLoginRoute: AuthLoginRoute,
+const AdminAdminLayoutRouteChildren: AdminAdminLayoutRouteChildren = {
+  AdminAdminIndexRoute: AdminAdminIndexRoute,
 }
 
-const AuthLayoutRouteWithChildren = AuthLayoutRoute._addFileChildren(
-  AuthLayoutRouteChildren,
-)
+const AdminAdminLayoutRouteWithChildren =
+  AdminAdminLayoutRoute._addFileChildren(AdminAdminLayoutRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   AppLayoutRoute: AppLayoutRouteWithChildren,
-  AuthLayoutRoute: AuthLayoutRouteWithChildren,
+  AdminAdminLayoutRoute: AdminAdminLayoutRouteWithChildren,
+  AuthLoginRoute: AuthLoginRoute,
   PublicPrivacidadeRoute: PublicPrivacidadeRoute,
   PublicTermosRoute: PublicTermosRoute,
-  PublicIndexRoute: PublicIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

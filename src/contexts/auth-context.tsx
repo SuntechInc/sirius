@@ -65,7 +65,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
             userType: payload.userType,
           });
           setError(null);
-          queryClient.invalidateQueries({ queryKey: ["auth"] });
+          queryClient.invalidateQueries();
         },
         onError: (error) => {
           const message =

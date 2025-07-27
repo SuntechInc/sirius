@@ -1,4 +1,11 @@
+import { AppSidebar } from "@/components/app-sidebar";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import Cookies from "js-cookie";
 
 export const Route = createFileRoute("/_app")({
   component: LayoutComponent,
@@ -12,10 +19,17 @@ export const Route = createFileRoute("/_app")({
 });
 
 function LayoutComponent() {
+  const defaultOpen = Cookies.get("sidebar_state") === "true";
+
   return (
-    <div>
-      <h1>Rotas autenticadas</h1>
-      <Outlet />
-    </div>
+    <SidebarProvider defaultOpen={defaultOpen}>
+      <AppSidebar />
+      <SidebarInset>
+        <main className="flex-1">
+          <SidebarTrigger />
+          <Outlet />
+        </main>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

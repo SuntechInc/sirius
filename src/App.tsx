@@ -1,17 +1,11 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/contexts/auth-context";
 import { useAuth } from "@/hooks/use-auth";
 import { routeTree } from "@/route-tree.gen";
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-    },
-  },
-});
+import { queryClient } from "./lib/query-client";
+import { DialogProvider } from "./components/dialog-provider";
 
 const router = createRouter({
   routeTree,
@@ -42,6 +36,7 @@ export function App() {
       <AuthProvider>
         <InnerApp />
         <Toaster />
+        <DialogProvider />
       </AuthProvider>
     </QueryClientProvider>
   );

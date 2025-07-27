@@ -1,9 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute("/_public/privacidade")({
-  component: PrivacyComponent,
-});
+export const Route = createFileRoute('/_public/privacidade')({
+  component: RouteComponent,
+})
 
-function PrivacyComponent() {
-  return <div>Hello "/_public/privacidade"!</div>;
+function RouteComponent() {
+  return <div>Hello "/_app/privacidade"!</div>
 }

@@ -35,7 +35,7 @@ export function LoginForm() {
 
     if (user?.userType !== UserType.GLOBAL_ADMIN) {
       await navigate({
-        to: "/dashboard",
+        to: "/",
       });
     }
     await navigate({

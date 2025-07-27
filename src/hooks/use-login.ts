@@ -1,6 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
-import type { AxiosError } from "axios";
-import { api } from "@/lib/api";
+import { useApiMutation } from "@/lib/react-query-utils";
 
 type ResponseType = {
   accessToken: string;
@@ -18,11 +16,5 @@ type RequestType = {
 };
 
 export function useLoginMutation() {
-  return useMutation<ResponseType, AxiosError, RequestType>({
-    mutationFn: async (json) => {
-      const res = await api.post<ResponseType>("/auth/login", json);
-
-      return res.data;
-    },
-  });
+  return useApiMutation<ResponseType, RequestType>("POST", "/auth/login");
 }

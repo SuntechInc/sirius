@@ -22,4 +22,5 @@ export function getAuthTokens() {
 
 export function clearAuthTokens() {
   Cookies.remove("accessToken");
+  localStorage.removeItem("auth-storage");
 }

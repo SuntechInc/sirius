@@ -1,4 +1,5 @@
-import { NewCompanyDialog } from "@/pages/_app/cadastro/-components/new-company-dialog";
+import { EditBranchDialog } from "@/pages/_app/cadastros/-features/branches/components/edit-branch-dialog";
+import { NewBranchDialog } from "@/pages/_app/cadastros/-features/branches/components/new-branch-dialog";
 import { useMountedState } from "react-use";
 
 export function DialogProvider() {
@@ -8,7 +9,8 @@ export function DialogProvider() {
 
   return (
     <>
-      <NewCompanyDialog />
+      <NewBranchDialog />
+      <EditBranchDialog />
     </>
   );
 }

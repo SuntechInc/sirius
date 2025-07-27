@@ -5,7 +5,6 @@ import { useCheckAuth } from "@/hooks/use-check-auth";
 import { useLoginMutation } from "@/hooks/use-login";
 import { useAuthStore } from "@/lib/auth-store";
 import { clearAuthTokens, setAuthTokens } from "@/lib/storage";
-import type { AuthSchema } from "@/pages/_auth/-validations/auth";
 import type { User, UserType } from "@/types/user";
 
 type UserPayload = {
@@ -23,7 +22,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
-  login: (input: AuthSchema) => Promise<void>;
+  login: (input: { email: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -47,7 +46,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
   const loginMutation = useLoginMutation();
 
   const login = useCallback(
-    async (input: AuthSchema) => {
+    async (input: { email: string; password: string }) => {
       await loginMutation.mutateAsync(input, {
         onSuccess: (data) => {
           const payload = decodeJwt(data.accessToken) as unknown as UserPayload;

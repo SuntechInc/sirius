@@ -12,7 +12,7 @@ const quickActions = [
   {
     title: "Cadastros",
     description: "Acesse todos os cadastros do sistema",
-    url: "/cadastro",
+    url: "/cadastros",
     icon: Building2,
     color: "bg-blue-500",
   },

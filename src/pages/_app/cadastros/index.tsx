@@ -2,7 +2,7 @@ import { Input } from "@/components/ui/input";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Briefcase, Building2, Search, User, Users2 } from "lucide-react";
 
-export const Route = createFileRoute("/_app/cadastro/")({
+export const Route = createFileRoute("/_app/cadastros/")({
   component: RouteComponent,
 });
 
@@ -10,28 +10,28 @@ const cadastros = [
   {
     title: "Empresas e Filiais",
     description: "Gerencie as empresas e filiais do sistema",
-    url: "/cadastro/empresas",
+    url: "/cadastros/empresas",
     icon: Building2,
     color: "bg-blue-500",
   },
   {
     title: "Departamentos",
     description: "Gerencie os departamentos",
-    url: "/cadastro/departamentos",
+    url: "/cadastros/departamentos",
     icon: Users2,
     color: "bg-orange-500",
   },
   {
     title: "Funcionários",
     description: "Gerencie os funcionários",
-    url: "/cadastro/funcionarios",
+    url: "/cadastros/funcionarios",
     icon: User,
     color: "bg-purple-500",
   },
   {
     title: "Cargos",
     description: "Gerencie os cargos e funções",
-    url: "/cadastro/cargos",
+    url: "/cadastros/cargos",
     icon: Briefcase,
     color: "bg-red-500",
   },

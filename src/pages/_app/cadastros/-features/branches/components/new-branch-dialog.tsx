@@ -5,13 +5,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useNewCompany } from "../-hooks/use-new-company";
-import { useCreateCompany } from "../-hooks/use-create-company";
-import { CompanyForm } from "./company-form";
+import { useNewBranch } from "../store/use-new-branch";
+import { useCreateBranch } from "../hooks/use-create-branch";
+import { BranchForm } from "./branch-form";
 import { BranchStatus } from "@/types/enum";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
-import { createBranchSchema } from "../-validations/company";
+import { createBranchSchema } from "../validations/branch";
 import type z from "zod";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -19,11 +19,11 @@ const formSchema = createBranchSchema.omit({
   companyId: true,
 });
 
-export function NewCompanyDialog() {
-  const { isOpen, onClose } = useNewCompany();
+export function NewBranchDialog() {
+  const { isOpen, onClose } = useNewBranch();
 
   const { user } = useAuth();
-  const mutation = useCreateCompany();
+  const mutation = useCreateBranch();
   const queryClient = useQueryClient();
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -58,7 +58,7 @@ export function NewCompanyDialog() {
             Crie uma nova conta para rastrear suas transações.
           </DialogDescription>
         </DialogHeader>
-        <CompanyForm
+        <BranchForm
           onSubmit={onSubmit}
           disabled={mutation.isPending}
           defaultValues={{

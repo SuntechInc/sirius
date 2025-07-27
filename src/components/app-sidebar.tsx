@@ -18,8 +18,8 @@ const items = [
     icon: LayoutDashboard,
   },
   {
-    title: "Cadastro",
-    url: "/cadastro",
+    title: "Cadastros",
+    url: "/cadastros",
     icon: FileEdit,
   },
 ];

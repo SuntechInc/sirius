@@ -1,19 +1,13 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { MoreHorizontal } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/data-table/column-header";
-import type { Company } from "../-services/get-companies";
+import { cn, getBranchStatus } from "@/lib/utils";
+import { BranchStatus } from "@/types/enum";
+import { Badge } from "@/components/ui/badge";
+import type { Branch } from "@/types/branch";
+import { Actions } from "./table-actions";
 
-export const companyTableColumns: ColumnDef<Company>[] = [
+export const tableColumns: ColumnDef<Branch>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -69,33 +63,28 @@ export const companyTableColumns: ColumnDef<Company>[] = [
   {
     accessorKey: "status",
     header: "Status",
+    cell: ({ row }) => {
+      const status = row.getValue("status") as BranchStatus;
+      let className = "";
+      switch (status) {
+        case BranchStatus.ACTIVE:
+          className = "bg-green-100 text-green-800 border-green-200";
+          break;
+        case BranchStatus.INACTIVE:
+          className = "bg-gray-100 text-gray-800 border-gray-200";
+          break;
+        case BranchStatus.OBSOLETE:
+          className = "bg-gray-100 text-gray-800 border-gray-200";
+          break;
+        case BranchStatus.SUSPENDED:
+          className = "bg-yellow-100 text-yellow-800 border-yellow-200";
+          break;
+      }
+      return <Badge className={cn(className)}>{getBranchStatus(status)}</Badge>;
+    },
   },
   {
     id: "actions",
-    cell: ({ row }) => {
-      const company = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(company.id)}
-            >
-              Copy company ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View company details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    cell: ({ row }) => <Actions id={row.original.id} />,
   },
 ];

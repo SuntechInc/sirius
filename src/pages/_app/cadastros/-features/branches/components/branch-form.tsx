@@ -12,7 +12,7 @@ import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
-import { createBranchSchema } from "../-validations/company";
+import { createBranchSchema } from "../validations/branch";
 import { Switch } from "@/components/ui/switch";
 import {
   Select,
@@ -36,7 +36,7 @@ const formSchema = createBranchSchema.omit({
   companyId: true,
 });
 
-export function CompanyForm({
+export function BranchForm({
   id,
   defaultValues,
   onSubmit,

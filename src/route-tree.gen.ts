@@ -15,9 +15,9 @@ import { Route as PublicTermosRouteImport } from './pages/_public/termos'
 import { Route as PublicPrivacidadeRouteImport } from './pages/_public/privacidade'
 import { Route as AuthLoginRouteImport } from './pages/_auth/login'
 import { Route as AdminAdminLayoutRouteImport } from './pages/_admin/admin/layout'
-import { Route as AppCadastroIndexRouteImport } from './pages/_app/cadastro/index'
+import { Route as AppCadastrosIndexRouteImport } from './pages/_app/cadastros/index'
 import { Route as AdminAdminIndexRouteImport } from './pages/_admin/admin/index'
-import { Route as AppCadastroEmpresasRouteImport } from './pages/_app/cadastro/empresas'
+import { Route as AppCadastrosEmpresasRouteImport } from './pages/_app/cadastros/empresas'
 
 const AppLayoutRoute = AppLayoutRouteImport.update({
   id: '/_app',
@@ -48,9 +48,9 @@ const AdminAdminLayoutRoute = AdminAdminLayoutRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppCadastroIndexRoute = AppCadastroIndexRouteImport.update({
-  id: '/cadastro/',
-  path: '/cadastro/',
+const AppCadastrosIndexRoute = AppCadastrosIndexRouteImport.update({
+  id: '/cadastros/',
+  path: '/cadastros/',
   getParentRoute: () => AppLayoutRoute,
 } as any)
 const AdminAdminIndexRoute = AdminAdminIndexRouteImport.update({
@@ -58,9 +58,9 @@ const AdminAdminIndexRoute = AdminAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminAdminLayoutRoute,
 } as any)
-const AppCadastroEmpresasRoute = AppCadastroEmpresasRouteImport.update({
-  id: '/cadastro/empresas',
-  path: '/cadastro/empresas',
+const AppCadastrosEmpresasRoute = AppCadastrosEmpresasRouteImport.update({
+  id: '/cadastros/empresas',
+  path: '/cadastros/empresas',
   getParentRoute: () => AppLayoutRoute,
 } as any)
 
@@ -70,18 +70,18 @@ export interface FileRoutesByFullPath {
   '/privacidade': typeof PublicPrivacidadeRoute
   '/termos': typeof PublicTermosRoute
   '/': typeof AppIndexRoute
-  '/cadastro/empresas': typeof AppCadastroEmpresasRoute
+  '/cadastros/empresas': typeof AppCadastrosEmpresasRoute
   '/admin/': typeof AdminAdminIndexRoute
-  '/cadastro': typeof AppCadastroIndexRoute
+  '/cadastros': typeof AppCadastrosIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
   '/privacidade': typeof PublicPrivacidadeRoute
   '/termos': typeof PublicTermosRoute
   '/': typeof AppIndexRoute
-  '/cadastro/empresas': typeof AppCadastroEmpresasRoute
+  '/cadastros/empresas': typeof AppCadastrosEmpresasRoute
   '/admin': typeof AdminAdminIndexRoute
-  '/cadastro': typeof AppCadastroIndexRoute
+  '/cadastros': typeof AppCadastrosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -91,9 +91,9 @@ export interface FileRoutesById {
   '/_public/privacidade': typeof PublicPrivacidadeRoute
   '/_public/termos': typeof PublicTermosRoute
   '/_app/': typeof AppIndexRoute
-  '/_app/cadastro/empresas': typeof AppCadastroEmpresasRoute
+  '/_app/cadastros/empresas': typeof AppCadastrosEmpresasRoute
   '/_admin/admin/': typeof AdminAdminIndexRoute
-  '/_app/cadastro/': typeof AppCadastroIndexRoute
+  '/_app/cadastros/': typeof AppCadastrosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -103,18 +103,18 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/termos'
     | '/'
-    | '/cadastro/empresas'
+    | '/cadastros/empresas'
     | '/admin/'
-    | '/cadastro'
+    | '/cadastros'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
     | '/privacidade'
     | '/termos'
     | '/'
-    | '/cadastro/empresas'
+    | '/cadastros/empresas'
     | '/admin'
-    | '/cadastro'
+    | '/cadastros'
   id:
     | '__root__'
     | '/_app'
@@ -123,9 +123,9 @@ export interface FileRouteTypes {
     | '/_public/privacidade'
     | '/_public/termos'
     | '/_app/'
-    | '/_app/cadastro/empresas'
+    | '/_app/cadastros/empresas'
     | '/_admin/admin/'
-    | '/_app/cadastro/'
+    | '/_app/cadastros/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -180,11 +180,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminLayoutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_app/cadastro/': {
-      id: '/_app/cadastro/'
-      path: '/cadastro'
-      fullPath: '/cadastro'
-      preLoaderRoute: typeof AppCadastroIndexRouteImport
+    '/_app/cadastros/': {
+      id: '/_app/cadastros/'
+      path: '/cadastros'
+      fullPath: '/cadastros'
+      preLoaderRoute: typeof AppCadastrosIndexRouteImport
       parentRoute: typeof AppLayoutRoute
     }
     '/_admin/admin/': {
@@ -194,11 +194,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminIndexRouteImport
       parentRoute: typeof AdminAdminLayoutRoute
     }
-    '/_app/cadastro/empresas': {
-      id: '/_app/cadastro/empresas'
-      path: '/cadastro/empresas'
-      fullPath: '/cadastro/empresas'
-      preLoaderRoute: typeof AppCadastroEmpresasRouteImport
+    '/_app/cadastros/empresas': {
+      id: '/_app/cadastros/empresas'
+      path: '/cadastros/empresas'
+      fullPath: '/cadastros/empresas'
+      preLoaderRoute: typeof AppCadastrosEmpresasRouteImport
       parentRoute: typeof AppLayoutRoute
     }
   }
@@ -206,14 +206,14 @@ declare module '@tanstack/react-router' {
 
 interface AppLayoutRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
-  AppCadastroEmpresasRoute: typeof AppCadastroEmpresasRoute
-  AppCadastroIndexRoute: typeof AppCadastroIndexRoute
+  AppCadastrosEmpresasRoute: typeof AppCadastrosEmpresasRoute
+  AppCadastrosIndexRoute: typeof AppCadastrosIndexRoute
 }
 
 const AppLayoutRouteChildren: AppLayoutRouteChildren = {
   AppIndexRoute: AppIndexRoute,
-  AppCadastroEmpresasRoute: AppCadastroEmpresasRoute,
-  AppCadastroIndexRoute: AppCadastroIndexRoute,
+  AppCadastrosEmpresasRoute: AppCadastrosEmpresasRoute,
+  AppCadastrosIndexRoute: AppCadastrosIndexRoute,
 }
 
 const AppLayoutRouteWithChildren = AppLayoutRoute._addFileChildren(

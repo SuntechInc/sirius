@@ -1,12 +1,12 @@
 import { create } from "zustand";
 
-type NewCompanyState = {
+type NewBranchState = {
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
 };
 
-export const useNewCompany = create<NewCompanyState>((set) => ({
+export const useNewBranch = create<NewBranchState>((set) => ({
   isOpen: false,
   onOpen: () => set({ isOpen: true }),
   onClose: () => set({ isOpen: false }),

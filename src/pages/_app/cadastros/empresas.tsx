@@ -16,14 +16,14 @@ export const Route = createFileRoute("/_app/cadastros/empresas")({
     return <div>Carregando...</div>;
   },
   loader: async ({ context: { queryClient, auth } }) => {
-    await queryClient.ensureQueryData(getBranches(auth.user?.companyId));
+    await queryClient.ensureQueryData(getBranches(auth.user?.actionCompanyId));
   },
 });
 
 function RouteComponent() {
   const { auth } = Route.useRouteContext();
   const { data: branchesQuery } = useSuspenseQuery(
-    getBranches(auth.user?.companyId),
+    getBranches(auth.user?.actionCompanyId),
   );
 
   const onOpen = useNewBranch((state) => state.onOpen);

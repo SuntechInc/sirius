@@ -12,6 +12,9 @@ import { useConfirm } from "@/hooks/use-confirm";
 import { Loader2 } from "lucide-react";
 import { BranchForm } from "./branch-form";
 import { BranchStatus } from "@/types/enum";
+import { useDisableBranch } from "../hooks/use-disable-branch";
+import { useGetBranchById } from "../hooks/use-get-branch-by-id";
+import { useAuth } from "@/hooks/use-auth";
 
 const formSchema = createBranchSchema.omit({
   companyId: true,
@@ -24,11 +27,15 @@ export function EditBranchDialog() {
 
   const [ConfirmDialog, confirm] = useConfirm(
     "Você tem certeza?",
-    "Você está prestes a excluir essa conta.",
+    "Você está prestes a desativar essa empresa.",
   );
 
-  const isPending = false;
-  const isLoading = false;
+  const { user } = useAuth();
+  const branchQuery = useGetBranchById(user?.companyId, id);
+  const disableBranchMutation = useDisableBranch(id);
+
+  const isPending = disableBranchMutation.isPending;
+  const isLoading = branchQuery.isLoading;
 
   function onSubmit(values: FormValues) {
     alert("TODO: Feature de editar empresa");
@@ -38,21 +45,39 @@ export function EditBranchDialog() {
     const ok = await confirm();
 
     if (ok) {
-      alert("TODO: Feature de excluir empresa");
+      disableBranchMutation.mutate(undefined, {
+        onSuccess: () => {
+          onClose();
+        },
+      });
     }
   }
 
-  const defaultValues = {
-    tradingName: "",
-    legalName: "",
-    code: "",
-    email: "",
-    phone: "",
-    responsible: "",
-    taxId: "",
-    isHeadquarter: false,
-    status: BranchStatus.ACTIVE,
-  };
+  const branchData = branchQuery.data?.data[0];
+
+  const defaultValues = branchData
+    ? {
+        tradingName: branchData.tradingName,
+        legalName: branchData.legalName,
+        code: branchData.code,
+        email: branchData.email,
+        phone: branchData.phone,
+        responsible: branchData.responsible,
+        taxId: branchData.taxId,
+        isHeadquarter: branchData.isHeadquarter,
+        status: branchData.status,
+      }
+    : {
+        tradingName: "",
+        legalName: "",
+        code: "",
+        email: "",
+        phone: "",
+        responsible: "",
+        taxId: "",
+        isHeadquarter: false,
+        status: BranchStatus.ACTIVE,
+      };
 
   return (
     <>
@@ -60,8 +85,10 @@ export function EditBranchDialog() {
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Editar conta</DialogTitle>
-            <DialogDescription>Edite uma conta já existente.</DialogDescription>
+            <DialogTitle>Editar empresa</DialogTitle>
+            <DialogDescription>
+              Edite uma empresa já existente.
+            </DialogDescription>
           </DialogHeader>
           {isLoading ? (
             <div className="absolute inset-0 flex items-center justify-center">

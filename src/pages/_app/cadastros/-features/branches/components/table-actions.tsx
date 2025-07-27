@@ -8,8 +8,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useConfirm } from "@/hooks/use-confirm";
-import { Edit, MoreHorizontal, Trash } from "lucide-react";
+import { CircleOff, Edit, MoreHorizontal } from "lucide-react";
 import { useOpenBranch } from "../store/use-open-branch";
+import { useDisableBranch } from "../hooks/use-disable-branch";
 
 type ActionsProps = {
   id: string;
@@ -18,8 +19,10 @@ type ActionsProps = {
 export function Actions({ id }: ActionsProps) {
   const [ConfirmDialog, confirm] = useConfirm(
     "Você tem certeza?",
-    "Você está prestes a excluir essa empresa.",
+    "Você está prestes a desativar essa empresa.",
   );
+
+  const disableBranchMutation = useDisableBranch(id);
 
   const onOpen = useOpenBranch((state) => state.onOpen);
 
@@ -27,7 +30,7 @@ export function Actions({ id }: ActionsProps) {
     const ok = await confirm();
 
     if (ok) {
-      alert("TODO: Feature de deletar empresa");
+      disableBranchMutation.mutate();
     }
   }
 
@@ -46,8 +49,8 @@ export function Actions({ id }: ActionsProps) {
             Editar
           </DropdownMenuItem>
           <DropdownMenuItem disabled={false} onClick={handleDelete}>
-            <Trash className="mr-2 size-4" />
-            Excluir
+            <CircleOff className="mr-2 size-4" />
+            Desativar
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

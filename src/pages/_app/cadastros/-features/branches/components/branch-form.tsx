@@ -58,19 +58,18 @@ export function BranchForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="grid grid-cols-2 gap-4"
+      >
         <FormField
           name="tradingName"
           control={form.control}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nome fantasia</FormLabel>
+              <FormLabel>Nome Fantasia</FormLabel>
               <FormControl>
-                <Input
-                  disabled={disabled}
-                  placeholder="Nome fantasia"
-                  {...field}
-                />
+                <Input disabled={disabled} placeholder="Acme" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -83,11 +82,7 @@ export function BranchForm({
             <FormItem>
               <FormLabel>Razão Social</FormLabel>
               <FormControl>
-                <Input
-                  disabled={disabled}
-                  placeholder="Razão social"
-                  {...field}
-                />
+                <Input disabled={disabled} placeholder="Acme LTDA" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -100,7 +95,11 @@ export function BranchForm({
             <FormItem>
               <FormLabel>CNPJ</FormLabel>
               <FormControl>
-                <Input disabled={disabled} placeholder="CNPJ" {...field} />
+                <Input
+                  disabled={disabled}
+                  placeholder="00.000.000/0000-00"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -115,7 +114,7 @@ export function BranchForm({
               <FormControl>
                 <Input
                   disabled={disabled}
-                  placeholder="E-mail da empresa"
+                  placeholder="email@exemplo.com.br"
                   {...field}
                 />
               </FormControl>
@@ -132,7 +131,7 @@ export function BranchForm({
               <FormControl>
                 <Input
                   disabled={disabled}
-                  placeholder="Telefone da empresa"
+                  placeholder="+55 (00) 00000-0000"
                   {...field}
                 />
               </FormControl>
@@ -147,7 +146,7 @@ export function BranchForm({
             <FormItem>
               <FormLabel>Código</FormLabel>
               <FormControl>
-                <Input disabled={disabled} placeholder="Código" {...field} />
+                <Input disabled={disabled} placeholder="BR001" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -162,7 +161,7 @@ export function BranchForm({
               <FormControl>
                 <Input
                   disabled={disabled}
-                  placeholder="Responsável"
+                  placeholder="Responsável dessa empresa"
                   {...field}
                 />
               </FormControl>
@@ -208,9 +207,9 @@ export function BranchForm({
           name="isHeadquarter"
           control={form.control}
           render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+            <FormItem className="col-span-2 flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
               <div className="space-y-0.5">
-                <FormLabel>É filial</FormLabel>
+                <FormLabel>Filial:</FormLabel>
                 <FormDescription>
                   Escolha se essa empresa é uma filial ou não.
                 </FormDescription>
@@ -225,7 +224,7 @@ export function BranchForm({
             </FormItem>
           )}
         />
-        <Button className="w-full" disabled={disabled}>
+        <Button className="col-span-2" disabled={disabled}>
           {id ? "Salvar mudanças" : "Criar empresa"}
         </Button>
         {!!id && (
@@ -233,7 +232,7 @@ export function BranchForm({
             type="button"
             disabled={disabled}
             onClick={handleDelete}
-            className="w-full"
+            className="col-span-2"
             variant="outline"
           >
             <Trash className="mr-2 size-4" />

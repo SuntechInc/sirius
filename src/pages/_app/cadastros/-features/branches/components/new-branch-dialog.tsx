@@ -51,11 +51,11 @@ export function NewBranchDialog() {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Nova conta</DialogTitle>
+          <DialogTitle>Nova empresa</DialogTitle>
           <DialogDescription>
-            Crie uma nova conta para rastrear suas transações.
+            Crie e gerencie uma nova empresa.
           </DialogDescription>
         </DialogHeader>
         <BranchForm

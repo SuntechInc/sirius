@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 
 const branchStatus = {
   [BranchStatus.ACTIVE]: "Ativa",
-  [BranchStatus.INACTIVE]: "Inativa",
+  [BranchStatus.INACTIVE]: "Desativada",
   [BranchStatus.OBSOLETE]: "Obsoleta",
   [BranchStatus.SUSPENDED]: "Suspensa",
 } as const;

@@ -14,7 +14,7 @@ import { BranchForm } from "./branch-form";
 import { BranchStatus } from "@/types/enum";
 import { useDisableBranch } from "../mutations/use-disable-branch";
 import { useEditBranch } from "../mutations/use-edit-branch";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getBranchesQueryOptions } from "../queries/get-branches";
 
 type FormValues = z.input<typeof createBranchSchema>;
@@ -43,6 +43,8 @@ export function EditBranchDialog() {
   const isPending = disableBranchMutation.isPending;
   const isLoading = branchQuery.isLoading;
 
+  const queryClient = useQueryClient();
+
   function onSubmit(values: FormValues) {
     if (id) {
       editBranchMutation.mutate(
@@ -53,6 +55,14 @@ export function EditBranchDialog() {
         {
           onSuccess: () => {
             onClose();
+            queryClient.invalidateQueries({
+              queryKey: [
+                getBranchesQueryOptions().queryKey,
+                {
+                  "or.id": `eq:${id}`,
+                },
+              ],
+            });
           },
         },
       );

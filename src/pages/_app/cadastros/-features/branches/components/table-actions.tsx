@@ -10,7 +10,7 @@ import {
 import { useConfirm } from "@/hooks/use-confirm";
 import { CircleOff, Edit, MoreHorizontal } from "lucide-react";
 import { useOpenBranch } from "../store/use-open-branch";
-import { useDisableBranch } from "../hooks/use-disable-branch";
+import { useDisableBranch } from "../mutations/use-disable-branch";
 
 type ActionsProps = {
   id: string;
@@ -22,7 +22,7 @@ export function Actions({ id }: ActionsProps) {
     "Você está prestes a desativar essa empresa.",
   );
 
-  const disableBranchMutation = useDisableBranch(id);
+  const disableBranchMutation = useDisableBranch();
 
   const onOpen = useOpenBranch((state) => state.onOpen);
 
@@ -30,7 +30,7 @@ export function Actions({ id }: ActionsProps) {
     const ok = await confirm();
 
     if (ok) {
-      disableBranchMutation.mutate();
+      disableBranchMutation.mutate(id);
     }
   }
 

@@ -12,15 +12,12 @@ import { useConfirm } from "@/hooks/use-confirm";
 import { Loader2 } from "lucide-react";
 import { BranchForm } from "./branch-form";
 import { BranchStatus } from "@/types/enum";
-import { useDisableBranch } from "../hooks/use-disable-branch";
-import { useGetBranchById } from "../hooks/use-get-branch-by-id";
-import { useAuth } from "@/hooks/use-auth";
+import { useDisableBranch } from "../mutations/use-disable-branch";
+import { useEditBranch } from "../mutations/use-edit-branch";
+import { useQuery } from "@tanstack/react-query";
+import { getBranchesQueryOptions } from "../queries/get-branches";
 
-const formSchema = createBranchSchema.omit({
-  companyId: true,
-});
-
-type FormValues = z.input<typeof formSchema>;
+type FormValues = z.input<typeof createBranchSchema>;
 
 export function EditBranchDialog() {
   const { isOpen, onClose, id } = useOpenBranch();
@@ -30,22 +27,43 @@ export function EditBranchDialog() {
     "Você está prestes a desativar essa empresa.",
   );
 
-  const { user } = useAuth();
-  const branchQuery = useGetBranchById(user?.companyId, id);
-  const disableBranchMutation = useDisableBranch(id);
+  const branchQuery = useQuery(
+    getBranchesQueryOptions(
+      {
+        "or.id": `eq:${id}`,
+      },
+      {
+        select: (data) => data.data[0],
+      },
+    ),
+  );
+  const disableBranchMutation = useDisableBranch();
+  const editBranchMutation = useEditBranch();
 
   const isPending = disableBranchMutation.isPending;
   const isLoading = branchQuery.isLoading;
 
   function onSubmit(values: FormValues) {
-    alert("TODO: Feature de editar empresa");
+    if (id) {
+      editBranchMutation.mutate(
+        {
+          branchId: id,
+          data: values,
+        },
+        {
+          onSuccess: () => {
+            onClose();
+          },
+        },
+      );
+    }
   }
 
   async function onDelete() {
     const ok = await confirm();
 
-    if (ok) {
-      disableBranchMutation.mutate(undefined, {
+    if (ok && id) {
+      disableBranchMutation.mutate(id, {
         onSuccess: () => {
           onClose();
         },
@@ -53,7 +71,7 @@ export function EditBranchDialog() {
     }
   }
 
-  const branchData = branchQuery.data?.data[0];
+  const branchData = branchQuery.data;
 
   const defaultValues = branchData
     ? {

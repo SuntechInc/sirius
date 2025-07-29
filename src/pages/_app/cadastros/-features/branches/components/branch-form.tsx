@@ -26,15 +26,11 @@ import type z from "zod";
 
 type Props = {
   id?: string;
-  defaultValues?: z.infer<typeof formSchema>;
-  onSubmit: (values: z.infer<typeof formSchema>) => void;
+  defaultValues?: z.infer<typeof createBranchSchema>;
+  onSubmit: (values: z.infer<typeof createBranchSchema>) => void;
   onDelete?: () => void;
   disabled?: boolean;
 };
-
-const formSchema = createBranchSchema.omit({
-  companyId: true,
-});
 
 export function BranchForm({
   id,
@@ -43,12 +39,12 @@ export function BranchForm({
   onDelete,
   disabled = false,
 }: Props) {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof createBranchSchema>>({
+    resolver: zodResolver(createBranchSchema),
     defaultValues,
   });
 
-  function handleSubmit(values: z.infer<typeof formSchema>) {
+  function handleSubmit(values: z.infer<typeof createBranchSchema>) {
     onSubmit(values);
   }
 
@@ -209,9 +205,9 @@ export function BranchForm({
           render={({ field }) => (
             <FormItem className="col-span-2 flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
               <div className="space-y-0.5">
-                <FormLabel>Filial:</FormLabel>
+                <FormLabel>Matriz:</FormLabel>
                 <FormDescription>
-                  Escolha se essa empresa é uma filial ou não.
+                  Escolha se essa empresa é uma matriz ou não.
                 </FormDescription>
               </div>
               <FormControl>

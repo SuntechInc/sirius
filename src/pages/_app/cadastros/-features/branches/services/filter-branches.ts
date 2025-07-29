@@ -6,7 +6,6 @@ type Operator = "eq" | "in";
 export type FilterValue = `${Operator}:${string}`;
 
 export type BranchFilter = {
-  id?: FilterValue;
   status?: FilterValue;
   isHeadquarter?: FilterValue;
   tradingName?: FilterValue;
@@ -38,7 +37,7 @@ const buildParams = (filters: FilterParams) => {
   return params;
 };
 
-export async function getBranches(filters: FilterParams = {}) {
+export async function filterBranches(filters: FilterParams = {}) {
   const params = buildParams(filters);
 
   const { data } = await api.get<{ data: Branch[]; total: number }>(

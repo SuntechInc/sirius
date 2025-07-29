@@ -44,7 +44,6 @@ export const createBranchSchema = z.object({
     .or(z.literal("")),
   isHeadquarter: z.boolean().optional(),
   status: z.nativeEnum(BranchStatus),
-  companyId: z.string().min(1, "Company ID is required"),
 });
 
 export type CreateBranchFormData = z.infer<typeof createBranchSchema>;

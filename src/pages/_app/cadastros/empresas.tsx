@@ -1,11 +1,11 @@
-import { Button } from "@/components/ui/button";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { DataTable } from "@/components/data-table";
-import { useNewBranch } from "./-features/branches/store/use-new-branch";
+import { Button } from "@/components/ui/button";
 import { tableColumns } from "./-features/branches/components/table-columns";
-import { getBranches } from "./-features/branches/services/get-branches";
+import { useNewBranch } from "./-features/branches/store/use-new-branch";
+import { getBranchesQueryOptions } from "./-features/branches/queries/get-branches";
 
 export const Route = createFileRoute("/_app/cadastros/empresas")({
   component: RouteComponent,
@@ -15,16 +15,13 @@ export const Route = createFileRoute("/_app/cadastros/empresas")({
   pendingComponent: () => {
     return <div>Carregando...</div>;
   },
-  loader: async ({ context: { queryClient, auth } }) => {
-    await queryClient.ensureQueryData(getBranches(auth.user?.actionCompanyId));
+  loader: async ({ context: { queryClient } }) => {
+    await queryClient.ensureQueryData(getBranchesQueryOptions());
   },
 });
 
 function RouteComponent() {
-  const { auth } = Route.useRouteContext();
-  const { data: branchesQuery } = useSuspenseQuery(
-    getBranches(auth.user?.actionCompanyId),
-  );
+  const { data: branchesQuery } = useSuspenseQuery(getBranchesQueryOptions());
 
   const onOpen = useNewBranch((state) => state.onOpen);
 

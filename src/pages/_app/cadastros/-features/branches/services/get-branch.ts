@@ -1,4 +1,4 @@
-import api from "@/lib/api";
+import { api } from "@/lib/api";
 import type { Branch } from "@/types/branch";
 import { queryOptions } from "@tanstack/react-query";
 

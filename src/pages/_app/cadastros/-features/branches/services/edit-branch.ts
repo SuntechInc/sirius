@@ -1,4 +1,4 @@
-import api from "@/lib/api";
+import { api } from "@/lib/api";
 import type { Branch } from "@/types/branch";
 import type z from "zod";
 import type { createBranchSchema } from "../validations/branch";

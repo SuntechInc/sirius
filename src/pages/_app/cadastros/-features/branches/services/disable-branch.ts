@@ -1,4 +1,4 @@
-import api from "@/lib/api";
+import { api } from "@/lib/api";
 import type { Branch } from "@/types/branch";
 
 type ResponseType = Branch;

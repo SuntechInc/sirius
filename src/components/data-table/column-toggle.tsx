@@ -11,11 +11,15 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
+interface DataTableViewOptionsProps<TData> {
+  table: Table<TData>;
+  columnNames?: Record<string, string>;
+}
+
 export function DataTableViewOptions<TData>({
   table,
-}: {
-  table: Table<TData>;
-}) {
+  columnNames = {},
+}: DataTableViewOptionsProps<TData>) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -24,7 +28,7 @@ export function DataTableViewOptions<TData>({
           size="sm"
           className="ml-auto hidden h-8 lg:flex"
         >
-          <Settings2 />
+          <Settings2 className="size-4" />
           Visibilidade
         </Button>
       </DropdownMenuTrigger>
@@ -45,7 +49,7 @@ export function DataTableViewOptions<TData>({
                 checked={column.getIsVisible()}
                 onCheckedChange={(value) => column.toggleVisibility(!!value)}
               >
-                {column.id}
+                {columnNames[column.id] || column.id}
               </DropdownMenuCheckboxItem>
             );
           })}

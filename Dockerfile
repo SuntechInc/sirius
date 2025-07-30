@@ -1,62 +1,28 @@
 # syntax=docker.io/docker/dockerfile:1
 
-### 1) Stage "deps"
-FROM node:22.15.1-alpine3.20 AS deps
-RUN apk add --no-cache libc6-compat
+### 1) Stage "builder"
+FROM node:22-alpine AS builder
 WORKDIR /app
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .npmrc* ./
-RUN if [ -f yarn.lock ]; then \
-      yarn --frozen-lockfile; \
-    elif [ -f package-lock.json ]; then \
-      npm ci; \
-    elif [ -f pnpm-lock.yaml ]; then \
-      corepack enable pnpm && pnpm i --frozen-lockfile; \
-    else \
-      echo "Lockfile not found." && exit 1; \
-    fi
 
-### 2) Stage "builder"
-FROM node:22.15.1-alpine3.20 AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+# Copia os arquivos de manifesto e instala as dependências
+COPY package.json pnpm-lock.yaml* ./
+RUN corepack enable pnpm && pnpm i --frozen-lockfile
+
+# Copia o restante dos arquivos da aplicação
 COPY . .
-COPY .env.production .env
-ENV NEXT_TELEMETRY_DISABLED=1
-RUN if [ -f yarn.lock ]; then \
-      yarn build; \
-    elif [ -f package-lock.json ]; then \
-      npm run build; \
-    elif [ -f pnpm-lock.yaml ]; then \
-      corepack enable pnpm && pnpm run build; \
-    fi
 
-### 3) Stage "runner"
-FROM node:22.15.1-alpine3.20 AS runner
-WORKDIR /app
-ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
+# Builda a aplicação
+RUN pnpm build
 
-# Cria usuário não-root
-RUN addgroup --system --gid 1001 nodejs \
- && adduser --system --uid 1001 nextjs
+### 2) Stage "runner"
+FROM nginx:1.27-alpine AS runner
 
-# Copia o standalone e estáticos
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static    ./.next/static
+# Copia os arquivos buildados do estagio anterior
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Comentado pois não estamos usando arquivos estáticos no momento
-# USER root
-# RUN mkdir -p public && \
-#     for file in /app/public/*; do \
-#       [ -e "$file" ] && cp -r "$file" public/; \
-#     done
-# USER nextjs
+# Copia a configuração do Nginx
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 3000
-ENV PORT=3000 HOST=0.0.0.0
 
-# Healthcheck interno do Docker
-HEALTHCHECK --interval=30s --timeout=2s --start-period=10s --retries=3 \
-  CMD wget -q --spider http://localhost:3000/api/healthz || exit 1
-
-CMD ["node", "server.js"]
+CMD ["nginx", "-g", "daemon off;"]

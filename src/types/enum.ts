@@ -1,0 +1,6 @@
+export enum BranchStatus {
+  ACTIVE = "ACTIVE",
+  INACTIVE = "INACTIVE",
+  SUSPENDED = "SUSPENDED",
+  OBSOLETE = "OBSOLETE",
+}

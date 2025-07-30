@@ -1,47 +1,24 @@
-import axios, { type AxiosInstance } from 'axios'
-import { ApiError, NetworkError } from '@/types/api'
-import { getSession } from './session'
+import axios from "axios";
+import { getAuthTokens } from "./storage";
 
-export const createHttpClient = (baseURL: string): AxiosInstance => {
-  const client = axios.create({
-    baseURL,
-    timeout: 10000,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
+export const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api",
+  timeout: 10000,
+});
 
-  // Interceptor para requests
-  client.interceptors.request.use(
-    async config => {
-      // Adicionar token de autenticação se necessário
-      const { token } = await getSession()
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`
-      }
-      return config
-    },
-    error => Promise.reject(error)
-  )
+api.interceptors.request.use(
+  (config) => {
+    const { accessToken } = getAuthTokens();
 
-  // Interceptor para responses
-  client.interceptors.response.use(
-    response => response,
-    error => {
-      if (error.response) {
-        // Erro com resposta do servidor
-        throw new ApiError(
-          error.response.data?.message || 'Erro na API',
-          error.response.status,
-          error.response.data?.code
-        )
-      } else if (error.request) {
-        throw new NetworkError('Erro de conexão', error)
-      } else {
-        throw new Error('Erro desconhecido')
-      }
+    const isLoginRoute = config.url?.includes("/auth/login");
+
+    if (accessToken && !isLoginRoute) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
-  )
 
-  return client
-}
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);

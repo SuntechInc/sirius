@@ -96,18 +96,18 @@ function AuthProvider({ children }: { children: ReactNode }) {
   }, [isCheckingAuth, loginMutation.isPending, loading, setLoading]);
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isAuthenticated,
-        loading,
-        error,
-        login,
-        logout,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+      <AuthContext.Provider
+        value={{
+          user,
+          isAuthenticated,
+          loading,
+          error,
+          login,
+          logout,
+        }}
+      >
+        {children}
+      </AuthContext.Provider>
   );
 }
 

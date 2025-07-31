@@ -112,3 +112,28 @@ pnpm test     # Run test suite (if configured)
 - **Testing:** Add unit tests with Vitest and integration tests with Playwright
 - **Deployment:** Configure CI/CD pipeline for automated deployments
 - **Security:** Regular dependency updates and security audits
+
+## Feature Patterns
+
+### Architectural Patterns
+
+*   **Feature-Sliced Design:** The code is organized by features (e.g., `branches`), with each feature having its own directory containing all its related files (components, mutations, queries, services, store, and validations). This promotes modularity and separation of concerns.
+*   **Atomic Design Principles:** The `components` directory within each feature seems to follow Atomic Design principles, with smaller, reusable components (atoms) being composed into larger components (molecules, organisms).
+*   **State Management with Zustand:** The `store` directory indicates the use of Zustand for managing local component state, particularly for controlling dialogs and other UI elements.
+*   **Data Fetching with TanStack Query:** The `queries` and `mutations` directories, along with the use of `useQuery` and `useMutation`, demonstrate the use of TanStack Query for data fetching, caching, and synchronization.
+*   **Routing with TanStack Router:** The use of `createFileRoute` in the page components indicates that the application uses TanStack Router for type-safe routing.
+
+### Conventions
+
+*   **File Naming:**
+    *   Components are named in PascalCase (e.g., `BranchForm.tsx`).
+    *   Hooks are named with the `use` prefix (e.g., `useCreateBranch.ts`).
+    *   Services and other utility files are named in kebab-case (e.g., `get-branches.ts`).
+*   **Directory Structure:**
+    *   Feature-specific code is located in a `-features` directory within the page's directory. It's important to use the `-` before the folder name, it's a convention used by TanStack Router to indicate that the folder will not have any page route.
+    *   Each feature has a consistent subdirectory structure: `components`, `mutations`, `queries`, `services`, `store`, and `validations`.
+*   **Code Style:**
+    *   The code consistently uses TypeScript and JSX.
+    *   It follows modern JavaScript features, such as arrow functions and destructuring.
+    *   The use of `zod` for schema validation is a clear convention.
+    *   The `cn` utility from `shadcn/ui` is used for conditional class names.

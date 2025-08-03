@@ -10,10 +10,14 @@ import Cookies from "js-cookie";
 
 export const Route = createFileRoute("/_admin/admin")({
   component: RouteComponent,
-  beforeLoad: async ({ context }) => {
-    const isNotAdmin = context.auth.user?.userType !== UserType.GLOBAL_ADMIN;
+  beforeLoad: async ({ context: { auth } }) => {
+    if (!auth.isAuthenticated) {
+      throw redirect({
+        to: "/login",
+      });
+    }
 
-    if (isNotAdmin) {
+    if (auth.user?.userType !== UserType.GLOBAL_ADMIN) {
       throw redirect({
         to: "/",
       });

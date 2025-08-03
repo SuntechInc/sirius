@@ -1,7 +1,4 @@
-"use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { PasswordInput } from "@/components/password-input";
 import { Button } from "@/components/ui/button";
@@ -14,11 +11,17 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "@/hooks/use-auth";
 import { type AuthSchema, authSchema } from "../-validations/auth";
-import { UserType } from "@/types/user";
+import { useAuth } from "@/hooks/use-auth";
+import { useLoginMutation } from "@/hooks/use-login";
+import { decodeJwt } from "jose";
+import { UserType } from "@/types/enum";
+import { useNavigate } from "@tanstack/react-router";
 
 export function LoginForm() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const { mutateAsync, isPending } = useLoginMutation();
   const form = useForm<AuthSchema>({
     resolver: zodResolver(authSchema),
     defaultValues: {
@@ -27,19 +30,19 @@ export function LoginForm() {
     },
   });
 
-  const { login, loading, user } = useAuth();
-  const navigate = useNavigate();
-
   async function onSubmit(data: AuthSchema) {
-    await login(data);
+    await mutateAsync(data, {
+      onSuccess: async ({ accessToken }) => {
+        await login(accessToken);
 
-    if (user?.userType !== UserType.GLOBAL_ADMIN) {
-      await navigate({
-        to: "/",
-      });
-    }
-    await navigate({
-      to: "/admin",
+        const { userType } = decodeJwt<{
+          userType: UserType;
+        }>(accessToken);
+
+        const destination = userType === UserType.GLOBAL_ADMIN ? "/admin" : "/";
+
+        navigate({ to: destination });
+      },
     });
   }
 
@@ -57,7 +60,7 @@ export function LoginForm() {
               <FormLabel>E-mail</FormLabel>
               <FormControl>
                 <Input
-                  disabled={loading}
+                  disabled={isPending}
                   placeholder="email@exemplo.com"
                   {...field}
                 />
@@ -74,7 +77,7 @@ export function LoginForm() {
               <FormLabel>Senha</FormLabel>
               <FormControl>
                 <PasswordInput
-                  disabled={loading}
+                  disabled={isPending}
                   placeholder="********"
                   {...field}
                 />
@@ -83,8 +86,8 @@ export function LoginForm() {
             </FormItem>
           )}
         />
-        <Button disabled={loading} type="submit" className="cursor-pointer">
-          {loading ? "Entrando..." : "Entrar"}
+        <Button disabled={isPending} type="submit" className="cursor-pointer">
+          {isPending ? "Entrando..." : "Entrar"}
         </Button>
       </form>
     </Form>

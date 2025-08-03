@@ -8,7 +8,6 @@ import {
 import { z } from "zod";
 import { createBranchSchema } from "../validations/branch";
 import { useOpenBranch } from "../store/use-open-branch";
-import { useConfirm } from "@/hooks/use-confirm";
 import { Loader2 } from "lucide-react";
 import { BranchForm } from "./branch-form";
 import { BranchStatus } from "@/types/enum";
@@ -22,11 +21,6 @@ type FormValues = z.input<typeof createBranchSchema>;
 export function EditBranchDialog() {
   const { isOpen, onClose, id } = useOpenBranch();
 
-  const [ConfirmDialog, confirm] = useConfirm(
-    "Você tem certeza?",
-    "Você está prestes a desativar essa empresa.",
-  );
-
   const branchQuery = useQuery(
     getBranchesQueryOptions(
       {
@@ -34,6 +28,7 @@ export function EditBranchDialog() {
       },
       {
         select: (data) => data.data[0],
+        enabled: !!id,
       },
     ),
   );
@@ -69,18 +64,6 @@ export function EditBranchDialog() {
     }
   }
 
-  async function onDelete() {
-    const ok = await confirm();
-
-    if (ok && id) {
-      disableBranchMutation.mutate(id, {
-        onSuccess: () => {
-          onClose();
-        },
-      });
-    }
-  }
-
   const branchData = branchQuery.data;
 
   const defaultValues = branchData
@@ -108,31 +91,25 @@ export function EditBranchDialog() {
       };
 
   return (
-    <>
-      <ConfirmDialog />
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Editar empresa</DialogTitle>
-            <DialogDescription>
-              Edite uma empresa já existente.
-            </DialogDescription>
-          </DialogHeader>
-          {isLoading ? (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Loader2 className="size-4 animate-spin text-muted-foreground" />
-            </div>
-          ) : (
-            <BranchForm
-              id={id}
-              onSubmit={onSubmit}
-              disabled={isPending}
-              defaultValues={defaultValues}
-              onDelete={onDelete}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
-    </>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Editar empresa</DialogTitle>
+          <DialogDescription>Edite uma empresa já existente.</DialogDescription>
+        </DialogHeader>
+        {isLoading ? (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Loader2 className="size-4 animate-spin text-muted-foreground" />
+          </div>
+        ) : (
+          <BranchForm
+            id={id}
+            onSubmit={onSubmit}
+            disabled={isPending}
+            defaultValues={defaultValues}
+          />
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }

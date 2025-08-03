@@ -9,7 +9,7 @@ export async function getCompanies(filters: FilterParams = {}) {
   const params = buildParams(filters);
 
   const response = await api.get<{ data: Company[]; total: number }>(
-    "/companies/companies/filter",
+    "/companies/filter",
     {
       params,
     },

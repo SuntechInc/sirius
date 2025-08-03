@@ -4,15 +4,22 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { UserType } from "@/types/user";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import Cookies from "js-cookie";
 
 export const Route = createFileRoute("/_app")({
   component: LayoutComponent,
-  beforeLoad: async ({ context }) => {
-    if (!context.auth.isAuthenticated) {
+  beforeLoad: async ({ context: { auth } }) => {
+    if (!auth.isAuthenticated) {
       throw redirect({
         to: "/login",
+      });
+    }
+
+    if (auth.user?.userType === UserType.GLOBAL_ADMIN) {
+      throw redirect({
+        to: "/admin",
       });
     }
   },

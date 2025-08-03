@@ -3,12 +3,8 @@ import type { User } from "@/types/user";
 
 type ResponseType = User;
 
-export async function getProfile(token: string | null) {
-  const res = await api.get<ResponseType>("/auth/profile", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+export async function getProfile() {
+  const res = await api.get<ResponseType>("/auth/profile");
 
   return res.data;
 }

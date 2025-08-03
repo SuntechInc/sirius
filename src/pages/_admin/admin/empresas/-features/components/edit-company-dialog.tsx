@@ -6,21 +6,20 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { z } from "zod";
-import { createBranchSchema } from "../validations/branch";
-import { useOpenBranch } from "../store/use-open-branch";
 import { useConfirm } from "@/hooks/use-confirm";
 import { Loader2 } from "lucide-react";
-import { BranchForm } from "./branch-form";
-import { BranchStatus } from "@/types/enum";
-import { useDisableBranch } from "../mutations/use-disable-branch";
-import { useEditBranch } from "../mutations/use-edit-branch";
+import type { createCompanySchema } from "../validations/company";
+import { useOpenCompany } from "../store/use-open-company";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getBranchesQueryOptions } from "../queries/get-branches";
+import { getCompaniesQueryOptions } from "../queries/get-companies";
+import { useDisableCompany } from "../mutations/use-disable-company";
+import { useEditCompany } from "../mutations/use-edit-company";
+import { CompanyStatus } from "@/types/enum";
 
-type FormValues = z.input<typeof createBranchSchema>;
+type FormValues = z.input<typeof createCompanySchema>;
 
-export function EditBranchDialog() {
-  const { isOpen, onClose, id } = useOpenBranch();
+export function EditCompanyDialog() {
+  const { isOpen, onClose, id } = useOpenCompany();
 
   const [ConfirmDialog, confirm] = useConfirm(
     "Você tem certeza?",
@@ -28,7 +27,7 @@ export function EditBranchDialog() {
   );
 
   const branchQuery = useQuery(
-    getBranchesQueryOptions(
+    getCompaniesQueryOptions(
       {
         "or.id": `eq:${id}`,
       },
@@ -37,19 +36,19 @@ export function EditBranchDialog() {
       },
     ),
   );
-  const disableBranchMutation = useDisableBranch();
-  const editBranchMutation = useEditBranch();
+  const disableCompanyMutation = useDisableCompany();
+  const editCompanyMutation = useEditCompany();
 
-  const isPending = disableBranchMutation.isPending;
+  const isPending = disableCompanyMutation.isPending;
   const isLoading = branchQuery.isLoading;
 
   const queryClient = useQueryClient();
 
   function onSubmit(values: FormValues) {
     if (id) {
-      editBranchMutation.mutate(
+      editCompanyMutation.mutate(
         {
-          branchId: id,
+          companyId: id,
           data: values,
         },
         {
@@ -57,7 +56,7 @@ export function EditBranchDialog() {
             onClose();
             queryClient.invalidateQueries({
               queryKey: [
-                getBranchesQueryOptions().queryKey,
+                getCompaniesQueryOptions().queryKey,
                 {
                   "or.id": `eq:${id}`,
                 },
@@ -73,7 +72,7 @@ export function EditBranchDialog() {
     const ok = await confirm();
 
     if (ok && id) {
-      disableBranchMutation.mutate(id, {
+      disableCompanyMutation.mutate(id, {
         onSuccess: () => {
           onClose();
         },
@@ -104,7 +103,7 @@ export function EditBranchDialog() {
         responsible: "",
         taxId: "",
         isHeadquarter: false,
-        status: BranchStatus.ACTIVE,
+        status: CompanyStatus.ACTIVE,
       };
 
   return (
@@ -123,7 +122,7 @@ export function EditBranchDialog() {
               <Loader2 className="size-4 animate-spin text-muted-foreground" />
             </div>
           ) : (
-            <BranchForm
+            <CompanyForm
               id={id}
               onSubmit={onSubmit}
               disabled={isPending}

@@ -11,7 +11,6 @@ import {
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Trash } from "lucide-react";
 import { createBranchSchema } from "../validations/branch";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -28,15 +27,13 @@ type Props = {
   id?: string;
   defaultValues?: z.infer<typeof createBranchSchema>;
   onSubmit: (values: z.infer<typeof createBranchSchema>) => void;
-  onDelete?: () => void;
   disabled?: boolean;
 };
 
 export function BranchForm({
   id,
-  defaultValues,
   onSubmit,
-  onDelete,
+  defaultValues,
   disabled = false,
 }: Props) {
   const form = useForm<z.infer<typeof createBranchSchema>>({
@@ -46,10 +43,6 @@ export function BranchForm({
 
   function handleSubmit(values: z.infer<typeof createBranchSchema>) {
     onSubmit(values);
-  }
-
-  function handleDelete() {
-    onDelete?.();
   }
 
   return (
@@ -223,18 +216,6 @@ export function BranchForm({
         <Button className="col-span-2" disabled={disabled}>
           {id ? "Salvar mudanças" : "Criar empresa"}
         </Button>
-        {!!id && (
-          <Button
-            type="button"
-            disabled={disabled}
-            onClick={handleDelete}
-            className="col-span-2"
-            variant="outline"
-          >
-            <Trash className="mr-2 size-4" />
-            Excluir empresa
-          </Button>
-        )}
       </form>
     </Form>
   );

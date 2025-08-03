@@ -18,6 +18,7 @@ import { Route as AdminAdminLayoutRouteImport } from './pages/_admin/admin/layou
 import { Route as AppCadastrosIndexRouteImport } from './pages/_app/cadastros/index'
 import { Route as AdminAdminIndexRouteImport } from './pages/_admin/admin/index'
 import { Route as AppCadastrosEmpresasRouteImport } from './pages/_app/cadastros/empresas'
+import { Route as AdminAdminEmpresasIndexRouteImport } from './pages/_admin/admin/empresas/index'
 
 const AppLayoutRoute = AppLayoutRouteImport.update({
   id: '/_app',
@@ -63,6 +64,11 @@ const AppCadastrosEmpresasRoute = AppCadastrosEmpresasRouteImport.update({
   path: '/cadastros/empresas',
   getParentRoute: () => AppLayoutRoute,
 } as any)
+const AdminAdminEmpresasIndexRoute = AdminAdminEmpresasIndexRouteImport.update({
+  id: '/empresas/',
+  path: '/empresas/',
+  getParentRoute: () => AdminAdminLayoutRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/admin': typeof AdminAdminLayoutRouteWithChildren
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/cadastros/empresas': typeof AppCadastrosEmpresasRoute
   '/admin/': typeof AdminAdminIndexRoute
   '/cadastros': typeof AppCadastrosIndexRoute
+  '/admin/empresas': typeof AdminAdminEmpresasIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/cadastros/empresas': typeof AppCadastrosEmpresasRoute
   '/admin': typeof AdminAdminIndexRoute
   '/cadastros': typeof AppCadastrosIndexRoute
+  '/admin/empresas': typeof AdminAdminEmpresasIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/_app/cadastros/empresas': typeof AppCadastrosEmpresasRoute
   '/_admin/admin/': typeof AdminAdminIndexRoute
   '/_app/cadastros/': typeof AppCadastrosIndexRoute
+  '/_admin/admin/empresas/': typeof AdminAdminEmpresasIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -106,6 +115,7 @@ export interface FileRouteTypes {
     | '/cadastros/empresas'
     | '/admin/'
     | '/cadastros'
+    | '/admin/empresas'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -115,6 +125,7 @@ export interface FileRouteTypes {
     | '/cadastros/empresas'
     | '/admin'
     | '/cadastros'
+    | '/admin/empresas'
   id:
     | '__root__'
     | '/_app'
@@ -126,6 +137,7 @@ export interface FileRouteTypes {
     | '/_app/cadastros/empresas'
     | '/_admin/admin/'
     | '/_app/cadastros/'
+    | '/_admin/admin/empresas/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -201,6 +213,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCadastrosEmpresasRouteImport
       parentRoute: typeof AppLayoutRoute
     }
+    '/_admin/admin/empresas/': {
+      id: '/_admin/admin/empresas/'
+      path: '/empresas'
+      fullPath: '/admin/empresas'
+      preLoaderRoute: typeof AdminAdminEmpresasIndexRouteImport
+      parentRoute: typeof AdminAdminLayoutRoute
+    }
   }
 }
 
@@ -222,10 +241,12 @@ const AppLayoutRouteWithChildren = AppLayoutRoute._addFileChildren(
 
 interface AdminAdminLayoutRouteChildren {
   AdminAdminIndexRoute: typeof AdminAdminIndexRoute
+  AdminAdminEmpresasIndexRoute: typeof AdminAdminEmpresasIndexRoute
 }
 
 const AdminAdminLayoutRouteChildren: AdminAdminLayoutRouteChildren = {
   AdminAdminIndexRoute: AdminAdminIndexRoute,
+  AdminAdminEmpresasIndexRoute: AdminAdminEmpresasIndexRoute,
 }
 
 const AdminAdminLayoutRouteWithChildren =

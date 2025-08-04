@@ -10,7 +10,7 @@ const COOKIE_OPTIONS = {
 export function setAuthTokens(tokens: AuthTokens) {
   Cookies.set("accessToken", tokens.accessToken, {
     ...COOKIE_OPTIONS,
-    expires: new Date(Date.now() + tokens.expiresIn * 1000),
+    expires: new Date(Date.now() + tokens.expiresIn),
   });
 }
 

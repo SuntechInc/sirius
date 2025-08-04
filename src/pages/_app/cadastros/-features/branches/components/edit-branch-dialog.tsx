@@ -11,7 +11,6 @@ import { useOpenBranch } from "../store/use-open-branch";
 import { Loader2 } from "lucide-react";
 import { BranchForm } from "./branch-form";
 import { BranchStatus } from "@/types/enum";
-import { useDisableBranch } from "../mutations/use-disable-branch";
 import { useEditBranch } from "../mutations/use-edit-branch";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getBranchesQueryOptions } from "../queries/get-branches";
@@ -32,11 +31,9 @@ export function EditBranchDialog() {
       },
     ),
   );
-  const disableBranchMutation = useDisableBranch();
   const editBranchMutation = useEditBranch();
 
-  const isPending = disableBranchMutation.isPending;
-  const isLoading = branchQuery.isLoading;
+  const isLoading = branchQuery.isLoading || editBranchMutation.isPending;
 
   const queryClient = useQueryClient();
 
@@ -48,9 +45,8 @@ export function EditBranchDialog() {
           data: values,
         },
         {
-          onSuccess: () => {
-            onClose();
-            queryClient.invalidateQueries({
+          onSuccess: async () => {
+            await queryClient.invalidateQueries({
               queryKey: [
                 getBranchesQueryOptions().queryKey,
                 {
@@ -58,6 +54,7 @@ export function EditBranchDialog() {
                 },
               ],
             });
+            onClose();
           },
         },
       );
@@ -105,7 +102,7 @@ export function EditBranchDialog() {
           <BranchForm
             id={id}
             onSubmit={onSubmit}
-            disabled={isPending}
+            disabled={isLoading}
             defaultValues={defaultValues}
           />
         )}

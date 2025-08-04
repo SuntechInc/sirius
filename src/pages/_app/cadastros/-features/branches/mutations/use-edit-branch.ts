@@ -8,8 +8,8 @@ export function useEditBranch() {
 
   return useMutation({
     mutationFn: editBranch,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({
         queryKey: getBranchesQueryOptions().queryKey,
       });
       toast.success(`Empresa ${data.tradingName} atualizada com sucesso!`);

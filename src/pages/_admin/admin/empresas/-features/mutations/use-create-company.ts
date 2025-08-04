@@ -1,12 +1,22 @@
-import { api } from "@/lib/api";
-import type z from "zod";
-import type { createCompanySchema } from "../validations/company";
-import type { Company } from "@/types/company";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createCompany } from "../services/create-company";
+import { getCompaniesQueryOptions } from "../queries/get-companies";
+import { toast } from "sonner";
 
-type ResponseType = Company;
+export function useCreateCompany() {
+  const queryClient = useQueryClient();
 
-export async function createCompany(data: z.infer<typeof createCompanySchema>) {
-  const res = await api.post<ResponseType>("/companies/company", data);
-
-  return res.data;
+  return useMutation({
+    mutationFn: createCompany,
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({
+        queryKey: [getCompaniesQueryOptions().queryKey],
+      });
+      toast.success(`Empresa ${data.tradingName} criada com sucesso!`);
+    },
+    onError: (err) => {
+      toast.error(err.message);
+      console.error(err);
+    },
+  });
 }

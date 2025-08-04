@@ -1,7 +1,5 @@
 import { clearAuthTokens, getAuthTokens, setAuthTokens } from "@/lib/storage";
-import { getProfileQueryOptions } from "@/queries/get-profile";
 import type { User, UserType } from "@/types/user";
-import { useQuery } from "@tanstack/react-query";
 import { decodeJwt } from "jose";
 import * as React from "react";
 

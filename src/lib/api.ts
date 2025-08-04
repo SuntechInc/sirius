@@ -1,16 +1,10 @@
 import axios from "axios";
-import { getAuthTokens } from "./storage";
+import { getAuthTokens } from "@/lib/storage";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api",
   timeout: 10000,
 });
-
-let logoutCallback: (() => void) | null = null;
-
-export const setLogoutCallback = (callback: () => void) => {
-  logoutCallback = callback;
-};
 
 api.interceptors.request.use(
   (config) => {
@@ -25,17 +19,6 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
-    return Promise.reject(error);
-  },
-);
-
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      logoutCallback?.();
-      window.location.href = "/login";
-    }
     return Promise.reject(error);
   },
 );

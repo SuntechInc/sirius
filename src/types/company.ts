@@ -1,10 +1,17 @@
-import type { CompanyStatus } from "./enum";
+import type { CompanyStatus, Industry, Segment } from "./enum";
 
 export type Company = {
   id: string;
-  legalName: string;
   tradingName: string;
+  legalName: string;
+  taxId: string;
+  taxCountry: string;
   email: string;
+  phone: string;
+  industry: Industry;
+  segment: Segment;
   status: CompanyStatus;
-  createdAt: string;
+  isBaseCompany: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 };

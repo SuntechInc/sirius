@@ -2,41 +2,42 @@ import { CompanyStatus, Industry, Segment } from "@/types/enum";
 import z from "zod";
 
 export const createCompanySchema = z.object({
-  taxId: z
-    .string()
-    .min(1, "Tax ID is required")
-    .min(3, "Tax ID must be at least 11 characters long")
-    .transform((value) => value?.replace(/[^\d]/g, "") || ""),
   tradingName: z
     .string()
-    .min(1, "Trading name is required")
     .min(3, "Trading name must be at least 3 characters long")
-    .transform((value) => value?.trim() || ""),
+    .transform((value) => value?.trim()),
   legalName: z
     .string()
-    .min(1, "Legal name is required")
     .min(3, "Legal name must be at least 3 characters long")
-    .transform((value) => value?.trim() || ""),
+    .min(1, "Legal name is required")
+    .transform((value) => value?.trim()),
+  taxId: z
+    .string()
+    .min(11, "Tax ID must be at least 11 characters long")
+    .min(1, "Tax ID is required")
+    .transform((value) => value?.replace(/[^\d]/g, "")), // Remove non-numeric characters
+  taxCountry: z
+    .string()
+    .optional()
+    .transform((value) => value?.toUpperCase() || "BR"),
   email: z
     .string()
     .email("Invalid email format")
-    .transform((value) => value?.toLowerCase().trim() || "")
-    .optional()
-    .or(z.literal("")),
+    .min(1, "Email is required")
+    .transform((value) => value?.toLowerCase().trim()),
   phone: z
     .string()
     .min(10, "Phone number must be at least 10 characters long")
-    .regex(
-      /^[0-9+\-() ]+$/,
-      "Phone number can only contain numbers, +, -, () and spaces",
-    )
-    .transform((value) => value?.trim() || "")
-    .optional()
-    .or(z.literal("")),
-  isBaseCompany: z.boolean(),
-  status: z.nativeEnum(CompanyStatus),
-  segment: z.nativeEnum(Segment),
-  industry: z.nativeEnum(Industry),
+    .regex(/^[0-9+\-() ]+$/, {
+      message: "Phone number can only contain numbers, +, -, () and spaces",
+    })
+    .transform((value) => value?.trim())
+    .optional(),
+  industry: z.nativeEnum(Industry, { message: "Invalid industry" }),
+  segment: z.nativeEnum(Segment, { message: "Invalid segment" }),
+  status: z
+    .nativeEnum(CompanyStatus, { message: "Invalid company status" })
+    .default(CompanyStatus.ACTIVE),
 });
 
-export type CompanySchema = z.infer<typeof createCompanySchema>;
+export type CompanySchema = z.input<typeof createCompanySchema>;

@@ -5,7 +5,14 @@ import type { Company } from "@/types/company";
 
 type ResponseType = {
   data: Company[];
-  total: number;
+  pagination: {
+    page: number;
+    size: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrevious: boolean;
+  };
 };
 
 export function getCompaniesQueryOptions<TData = ResponseType, TError = Error>(
@@ -17,7 +24,7 @@ export function getCompaniesQueryOptions<TData = ResponseType, TError = Error>(
 ) {
   return queryOptions({
     ...options,
-    queryKey: ["companies", params],
+    queryKey: ["/companies/filter", params],
     queryFn: () => getCompanies(params),
   });
 }

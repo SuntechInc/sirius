@@ -1,19 +1,19 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { editCompany } from "../services/edit-company";
+import { getCompaniesQueryOptions } from "../queries/get-companies";
 import { toast } from "sonner";
-import { editBranch } from "../services/edit-branch";
-import { getBranchesQueryOptions } from "../queries/get-branches";
 
-export function useEditBranch() {
+export function useEditCompany() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: editBranch,
+    mutationFn: editCompany,
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({
-        queryKey: getBranchesQueryOptions().queryKey,
+        queryKey: getCompaniesQueryOptions().queryKey,
       });
       await queryClient.invalidateQueries({
-        queryKey: getBranchesQueryOptions({ "or.id": `eq:${data.id}` })
+        queryKey: getCompaniesQueryOptions({ "or.id": `eq:${data.id}` })
           .queryKey,
       });
       toast.success(`Empresa ${data.tradingName} atualizada com sucesso!`);

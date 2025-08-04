@@ -8,6 +8,15 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
+import { z } from "zod";
+import { createBranchSchema } from "../validations/branch";
+import { useOpenBranch } from "../store/use-open-branch";
+import { BranchForm } from "./branch-form";
+import { BranchStatus } from "@/types/enum";
+import { useEditBranch } from "../mutations/use-edit-branch";
+import { useQuery } from "@tanstack/react-query";
+import { getBranchesQueryOptions } from "../queries/get-branches";
+import { Loader2 } from "lucide-react";
 import { BranchStatus } from "@/types/enum";
 import { useEditBranch } from "../mutations/use-edit-branch";
 import { getBranchesQueryOptions } from "../queries/get-branches";
@@ -18,49 +27,40 @@ import { BranchForm } from "./branch-form";
 type FormValues = z.input<typeof createBranchSchema>;
 
 export function EditBranchDialog() {
-	const { isOpen, onClose, id } = useOpenBranch();
+  const { isOpen, onClose, id } = useOpenBranch();
 
-	const branchQuery = useQuery(
-		getBranchesQueryOptions(
-			{
-				"or.id": `eq:${id}`,
-			},
-			{
-				select: (data) => data.data[0],
-			},
-		),
-	);
-	const editBranchMutation = useEditBranch();
+  const branchQuery = useQuery(
+    getBranchesQueryOptions(
+      {
+        "or.id": `eq:${id}`,
+      },
+      {
+        select: (data) => data.data[0],
+        enabled: !!id,
+      },
+    ),
+  );
+  const editBranchMutation = useEditBranch();
 
-	const isLoading = branchQuery.isLoading || editBranchMutation.isPending;
+  const isLoading = branchQuery.isLoading || editBranchMutation.isPending;
 
-	const queryClient = useQueryClient();
+  function onSubmit(values: FormValues) {
+    if (id) {
+      editBranchMutation.mutate(
+        {
+          branchId: id,
+          data: values,
+        },
+        {
+          onSuccess: async () => {
+            onClose();
+          },
+        },
+      );
+    }
+  }
 
-	function onSubmit(values: FormValues) {
-		if (id) {
-			editBranchMutation.mutate(
-				{
-					branchId: id,
-					data: values,
-				},
-				{
-					onSuccess: () => {
-						onClose();
-						queryClient.invalidateQueries({
-							queryKey: [
-								getBranchesQueryOptions().queryKey,
-								{
-									"or.id": `eq:${id}`,
-								},
-							],
-						});
-					},
-				},
-			);
-		}
-	}
-
-	const branchData = branchQuery.data;
+  const branchData = branchQuery.data;
 
 	const defaultValues = branchData
 		? {
@@ -86,28 +86,26 @@ export function EditBranchDialog() {
 				status: BranchStatus.ACTIVE,
 			};
 
-	return (
-		<Dialog open={isOpen} onOpenChange={onClose}>
-			<DialogContent>
-				<DialogHeader>
-					<DialogTitle>Editar empresa</DialogTitle>
-					<DialogDescription>
-						Edite uma empresa já existente.
-					</DialogDescription>
-				</DialogHeader>
-				{isLoading ? (
-					<div className="absolute inset-0 flex items-center justify-center">
-						<Loader2 className="size-4 animate-spin text-muted-foreground" />
-					</div>
-				) : (
-					<BranchForm
-						id={id}
-						onSubmit={onSubmit}
-						disabled={isLoading}
-						defaultValues={defaultValues}
-					/>
-				)}
-			</DialogContent>
-		</Dialog>
-	);
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Editar empresa</DialogTitle>
+          <DialogDescription>Edite uma empresa já existente.</DialogDescription>
+        </DialogHeader>
+        {isLoading ? (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Loader2 className="size-4 animate-spin text-muted-foreground" />
+          </div>
+        ) : (
+          <BranchForm
+            id={id}
+            onSubmit={onSubmit}
+            disabled={isLoading}
+            defaultValues={defaultValues}
+          />
+        )}
+      </DialogContent>
+    </Dialog>
+  );
 }

@@ -8,19 +8,24 @@ import {
 } from "@/components/ui/sidebar";
 import { UserType } from "@/types/user";
 
-export const Route = createFileRoute("/_app")({
-	component: LayoutComponent,
-	beforeLoad: async ({ context: { auth } }) => {
-		if (!auth.isAuthenticated) {
-			throw redirect({
-				to: "/login",
-			});
-		}
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import Cookies from "js-cookie";
 
-		if (location.pathname === "/" && auth.user?.userType === UserType.GLOBAL_ADMIN) {
-			throw redirect({ to: "/admin" });
-		}
-	},
+export const Route = createFileRoute("/_app")({
+  component: LayoutComponent,
+  beforeLoad: async ({ context: { auth } }) => {
+    if (!auth.isAuthenticated) {
+      throw redirect({
+        to: "/login",
+      });
+    }
+
+    if (auth.user?.userType === UserType.GLOBAL_ADMIN) {
+      throw redirect({
+        to: "/admin",
+      });
+    }
+  },
 });
 
 function LayoutComponent() {

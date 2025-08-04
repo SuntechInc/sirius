@@ -1,113 +1,72 @@
-import { useQueryClient } from "@tanstack/react-query";
-import { decodeJwt } from "jose";
-import { createContext, type ReactNode, useCallback, useEffect } from "react";
-import { useCheckAuth } from "@/hooks/use-check-auth";
-import { useLoginMutation } from "@/hooks/use-login";
-import { useAuthStore } from "@/lib/auth-store";
-import { clearAuthTokens, setAuthTokens } from "@/lib/storage";
+import { clearAuthTokens, getAuthTokens, setAuthTokens } from "@/lib/storage";
 import type { User, UserType } from "@/types/user";
+import { decodeJwt } from "jose";
+import * as React from "react";
 
-type UserPayload = {
+type JWTPayload = {
   sub: string;
   email: string;
+  userType: UserType;
   companyId: string;
   actionCompanyId: string;
-  userType: UserType;
-  iat: number;
   exp: number;
 };
 
 interface AuthContextType {
-  user: User | null;
   isAuthenticated: boolean;
-  loading: boolean;
-  error: string | null;
-  login: (input: { email: string; password: string }) => Promise<void>;
+  login: (username: string) => Promise<void>;
   logout: () => Promise<void>;
+  user: User | null;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
 
-function AuthProvider({ children }: { children: ReactNode }) {
-  const queryClient = useQueryClient();
-  const {
-    user,
-    isAuthenticated,
-    loading,
-    error,
-    setUser,
-    setLoading,
-    setError,
-    clearAuth,
-  } = useAuthStore();
+function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = React.useState<User | null>(() => {
+    const { accessToken } = getAuthTokens();
 
-  const { data: authUser, isLoading: isCheckingAuth } = useCheckAuth(user);
+    if (accessToken) {
+      const decodedToken = decodeJwt<JWTPayload>(accessToken);
 
-  const loginMutation = useLoginMutation();
+      return {
+        id: decodedToken.sub,
+        email: decodedToken.email,
+        userType: decodedToken.userType,
+        companyId: decodedToken.companyId,
+        actionCompanyId: decodedToken.actionCompanyId,
+      };
+    }
 
-  const login = useCallback(
-    async (input: { email: string; password: string }) => {
-      await loginMutation.mutateAsync(input, {
-        onSuccess: (data) => {
-          const payload = decodeJwt(data.accessToken) as unknown as UserPayload;
+    return null;
+  });
+  const isAuthenticated = !!user;
 
-          setAuthTokens({
-            accessToken: data.accessToken,
-            expiresIn: payload.exp,
-          });
-
-          setUser({
-            id: payload.sub,
-            email: payload.email,
-            actionCompanyId: payload.actionCompanyId,
-            companyId: payload.companyId,
-            userType: payload.userType,
-          });
-          setError(null);
-          queryClient.invalidateQueries();
-        },
-        onError: (error) => {
-          const message =
-            error instanceof Error ? error.message : "Erro ao fazer login";
-          setError(message);
-        },
-      });
-    },
-    [loginMutation, queryClient, setError, setUser],
-  );
-
-  const logout = useCallback(async () => {
-    clearAuth();
+  const logout = React.useCallback(async () => {
     clearAuthTokens();
-    queryClient.clear();
-  }, [clearAuth, queryClient]);
+    setUser(null);
+  }, []);
 
-  useEffect(() => {
-    if (authUser && !user) {
-      setUser(authUser.user);
-    }
-  }, [authUser, user, setUser]);
+  const login = React.useCallback(async (accessToken: string) => {
+    const decodedToken = decodeJwt<JWTPayload>(accessToken);
 
-  useEffect(() => {
-    const isLoading = isCheckingAuth || loginMutation.isPending;
-    if (loading !== isLoading) {
-      setLoading(isLoading);
-    }
-  }, [isCheckingAuth, loginMutation.isPending, loading, setLoading]);
+    setAuthTokens({
+      accessToken,
+      expiresIn: decodedToken.exp,
+    });
+
+    setUser({
+      id: decodedToken.sub,
+      email: decodedToken.email,
+      userType: decodedToken.userType,
+      companyId: decodedToken.companyId,
+      actionCompanyId: decodedToken.actionCompanyId,
+    });
+  }, []);
 
   return (
-      <AuthContext.Provider
-        value={{
-          user,
-          isAuthenticated,
-          loading,
-          error,
-          login,
-          logout,
-        }}
-      >
-        {children}
-      </AuthContext.Provider>
+    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+      {children}
+    </AuthContext.Provider>
   );
 }
 

@@ -23,7 +23,7 @@ export type FilterParams = BranchFilter &
     size?: number;
   };
 
-const buildParams = (filters: FilterParams) => {
+export const buildParams = (filters: FilterParams) => {
   const params = new URLSearchParams();
 
   for (const key in filters) {

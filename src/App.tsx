@@ -6,6 +6,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { routeTree } from "@/route-tree.gen";
 import { queryClient } from "./lib/query-client";
 import { DialogProvider } from "./components/dialog-provider";
+import { useEffect } from "react";
+import { setLogoutCallback } from "./lib/api";
 
 const router = createRouter({
   routeTree,
@@ -26,6 +28,12 @@ declare module "@tanstack/react-router" {
 
 function InnerApp() {
   const auth = useAuth();
+
+  const { logout } = useAuth();
+
+  useEffect(() => {
+    setLogoutCallback(logout);
+  }, [logout]);
 
   return <RouterProvider router={router} context={{ auth }} />;
 }

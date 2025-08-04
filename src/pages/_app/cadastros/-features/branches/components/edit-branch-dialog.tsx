@@ -8,12 +8,12 @@ import {
 import { z } from "zod";
 import { createBranchSchema } from "../validations/branch";
 import { useOpenBranch } from "../store/use-open-branch";
-import { Loader2 } from "lucide-react";
 import { BranchForm } from "./branch-form";
 import { BranchStatus } from "@/types/enum";
 import { useEditBranch } from "../mutations/use-edit-branch";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { getBranchesQueryOptions } from "../queries/get-branches";
+import { Loader2 } from "lucide-react";
 
 type FormValues = z.input<typeof createBranchSchema>;
 
@@ -35,8 +35,6 @@ export function EditBranchDialog() {
 
   const isLoading = branchQuery.isLoading || editBranchMutation.isPending;
 
-  const queryClient = useQueryClient();
-
   function onSubmit(values: FormValues) {
     if (id) {
       editBranchMutation.mutate(
@@ -46,14 +44,6 @@ export function EditBranchDialog() {
         },
         {
           onSuccess: async () => {
-            await queryClient.invalidateQueries({
-              queryKey: [
-                getBranchesQueryOptions().queryKey,
-                {
-                  "or.id": `eq:${id}`,
-                },
-              ],
-            });
             onClose();
           },
         },

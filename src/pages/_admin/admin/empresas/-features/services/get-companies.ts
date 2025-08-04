@@ -20,9 +20,9 @@ type ResponseType = {
 export async function getCompanies(filters: FilterParams = {}) {
   const params = buildParams(filters);
 
-  const response = await api.get<ResponseType>("/companies/filter", {
+  const { data } = await api.get<ResponseType>("/companies/filter", {
     params,
   });
 
-  return response.data;
+  return data;
 }

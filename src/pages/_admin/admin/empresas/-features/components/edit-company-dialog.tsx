@@ -6,14 +6,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { z } from "zod";
-import { Loader2 } from "lucide-react";
 import type { createCompanySchema } from "../validations/company";
 import { useOpenCompany } from "../store/use-open-company";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { getCompaniesQueryOptions } from "../queries/get-companies";
 import { useEditCompany } from "../mutations/use-edit-company";
 import { CompanyStatus, Industry, Segment } from "@/types/enum";
 import { CompanyForm } from "./company-form";
+import { Loader2 } from "lucide-react";
 
 type FormValues = z.input<typeof createCompanySchema>;
 
@@ -35,8 +35,6 @@ export function EditCompanyDialog() {
 
   const isLoading = companyQuery.isLoading || editCompanyMutation.isPending;
 
-  const queryClient = useQueryClient();
-
   function onSubmit(values: FormValues) {
     if (id) {
       editCompanyMutation.mutate(
@@ -46,14 +44,6 @@ export function EditCompanyDialog() {
         },
         {
           onSuccess: async () => {
-            await queryClient.invalidateQueries({
-              queryKey: [
-                getCompaniesQueryOptions().queryKey,
-                {
-                  "or.id": `eq:${id}`,
-                },
-              ],
-            });
             onClose();
           },
         },

@@ -12,6 +12,10 @@ export function useEditCompany() {
       await queryClient.invalidateQueries({
         queryKey: getCompaniesQueryOptions().queryKey,
       });
+      await queryClient.invalidateQueries({
+        queryKey: getCompaniesQueryOptions({ "or.id": `eq:${data.id}` })
+          .queryKey,
+      });
       toast.success(`Empresa ${data.tradingName} atualizada com sucesso!`);
     },
     onError: (err) => {

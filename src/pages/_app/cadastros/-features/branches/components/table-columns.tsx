@@ -1,9 +1,9 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/data-table/column-header";
-import { cn, getBranchStatus } from "@/lib/utils";
-import { BranchStatus } from "@/types/enum";
 import { Badge } from "@/components/ui/badge";
+import { cn, getBranchStatus } from "@/lib/utils";
 import type { Branch } from "@/types/branch";
+import { BranchStatus } from "@/types/enum";
 import { Actions } from "./table-actions";
 
 export const tableColumns: ColumnDef<Branch>[] = [

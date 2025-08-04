@@ -1,9 +1,12 @@
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
+import type { z } from "zod";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
 } from "@/components/ui/dialog";
 import { z } from "zod";
 import { createBranchSchema } from "../validations/branch";
@@ -14,6 +17,12 @@ import { useEditBranch } from "../mutations/use-edit-branch";
 import { useQuery } from "@tanstack/react-query";
 import { getBranchesQueryOptions } from "../queries/get-branches";
 import { Loader2 } from "lucide-react";
+import { BranchStatus } from "@/types/enum";
+import { useEditBranch } from "../mutations/use-edit-branch";
+import { getBranchesQueryOptions } from "../queries/get-branches";
+import { useOpenBranch } from "../store/use-open-branch";
+import type { createBranchSchema } from "../validations/branch";
+import { BranchForm } from "./branch-form";
 
 type FormValues = z.input<typeof createBranchSchema>;
 
@@ -53,29 +62,29 @@ export function EditBranchDialog() {
 
   const branchData = branchQuery.data;
 
-  const defaultValues = branchData
-    ? {
-        tradingName: branchData.tradingName,
-        legalName: branchData.legalName,
-        code: branchData.code,
-        email: branchData.email,
-        phone: branchData.phone,
-        responsible: branchData.responsible,
-        taxId: branchData.taxId,
-        isHeadquarter: branchData.isHeadquarter,
-        status: branchData.status,
-      }
-    : {
-        tradingName: "",
-        legalName: "",
-        code: "",
-        email: "",
-        phone: "",
-        responsible: "",
-        taxId: "",
-        isHeadquarter: false,
-        status: BranchStatus.ACTIVE,
-      };
+	const defaultValues = branchData
+		? {
+				tradingName: branchData.tradingName,
+				legalName: branchData.legalName,
+				code: branchData.code,
+				email: branchData.email,
+				phone: branchData.phone,
+				responsible: branchData.responsible,
+				taxId: branchData.taxId,
+				isHeadquarter: branchData.isHeadquarter,
+				status: branchData.status,
+			}
+		: {
+				tradingName: "",
+				legalName: "",
+				code: "",
+				email: "",
+				phone: "",
+				responsible: "",
+				taxId: "",
+				isHeadquarter: false,
+				status: BranchStatus.ACTIVE,
+			};
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

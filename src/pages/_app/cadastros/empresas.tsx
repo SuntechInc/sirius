@@ -1,8 +1,8 @@
+import { DataTable } from "@/components/data-table";
+import { Button } from "@/components/ui/button";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
-import { DataTable } from "@/components/data-table";
-import { Button } from "@/components/ui/button";
 import { tableColumns } from "./-features/branches/components/table-columns";
 import { getBranchesQueryOptions } from "./-features/branches/queries/get-branches";
 import { useNewBranch } from "./-features/branches/store/use-new-branch";
@@ -40,7 +40,21 @@ function RouteComponent() {
             Nova empresa
           </Button>
         </div>
-        <DataTable columns={tableColumns} data={branchesQuery.data} />
+        <DataTable
+          columns={tableColumns}
+          data={branchesQuery.data}
+          searchableColumns={["tradingName", "email"]}
+          searchPlaceholder="Buscar empresa por..."
+          enableSearch={true}
+          columnNames={{
+            code: "Código",
+            tradingName: "Nome Fantasia",
+            legalName: "Razão Social",
+            phone: "Telefone",
+            responsible: "Responsável",
+            isHeadquarter: "Matriz",
+          }}
+        />
       </div>
     </div>
   );

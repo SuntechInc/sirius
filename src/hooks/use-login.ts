@@ -4,6 +4,7 @@ import type { AxiosError } from "axios";
 
 type ResponseType = {
   accessToken: string;
+  refreshToken: string;
 };
 
 type RequestType = {

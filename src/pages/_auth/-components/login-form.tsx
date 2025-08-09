@@ -32,8 +32,8 @@ export function LoginForm() {
 
   async function onSubmit(data: AuthSchema) {
     await mutateAsync(data, {
-      onSuccess: async ({ accessToken }) => {
-        await login(accessToken);
+      onSuccess: async ({ accessToken, refreshToken }) => {
+        await login(accessToken, refreshToken);
 
         const { userType } = decodeJwt<{
           userType: UserType;

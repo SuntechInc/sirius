@@ -14,7 +14,7 @@ type JWTPayload = {
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: (username: string) => Promise<void>;
+  login: (accessToken: string, refreshToken?: string) => Promise<void>;
   logout: () => Promise<void>;
   user: User | null;
 }
@@ -26,15 +26,26 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     const { accessToken } = getAuthTokens();
 
     if (accessToken) {
-      const decodedToken = decodeJwt<JWTPayload>(accessToken);
+      try {
+        const decodedToken = decodeJwt<JWTPayload>(accessToken);
 
-      return {
-        id: decodedToken.sub,
-        email: decodedToken.email,
-        userType: decodedToken.userType,
-        companyId: decodedToken.companyId,
-        actionCompanyId: decodedToken.actionCompanyId,
-      };
+        // Check if token is expired
+        if (decodedToken.exp * 1000 < Date.now()) {
+          clearAuthTokens();
+          return null;
+        }
+
+        return {
+          id: decodedToken.sub,
+          email: decodedToken.email,
+          userType: decodedToken.userType,
+          companyId: decodedToken.companyId,
+          actionCompanyId: decodedToken.actionCompanyId,
+        };
+      } catch {
+        clearAuthTokens();
+        return null;
+      }
     }
 
     return null;
@@ -46,22 +57,37 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
   }, []);
 
-  const login = React.useCallback(async (accessToken: string) => {
-    const decodedToken = decodeJwt<JWTPayload>(accessToken);
+  const login = React.useCallback(
+    async (accessToken: string, refreshToken?: string) => {
+      try {
+        const decodedToken = decodeJwt<JWTPayload>(accessToken);
 
-    setAuthTokens({
-      accessToken,
-      expiresIn: decodedToken.exp,
-    });
+        // Check if token is already expired
+        if (decodedToken.exp * 1000 < Date.now()) {
+          throw new Error("Token is expired");
+        }
 
-    setUser({
-      id: decodedToken.sub,
-      email: decodedToken.email,
-      userType: decodedToken.userType,
-      companyId: decodedToken.companyId,
-      actionCompanyId: decodedToken.actionCompanyId,
-    });
-  }, []);
+        setAuthTokens({
+          accessToken,
+          refreshToken,
+          expiresIn: decodedToken.exp,
+        });
+
+        setUser({
+          id: decodedToken.sub,
+          email: decodedToken.email,
+          userType: decodedToken.userType,
+          companyId: decodedToken.companyId,
+          actionCompanyId: decodedToken.actionCompanyId,
+        });
+      } catch (error) {
+        clearAuthTokens();
+        setUser(null);
+        throw error;
+      }
+    },
+    []
+  );
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>

@@ -1,11 +1,11 @@
+import { DataTable } from "@/components/data-table";
+import { Button } from "@/components/ui/button";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
-import { DataTable } from "@/components/data-table";
-import { Button } from "@/components/ui/button";
 import { tableColumns } from "./-features/components/table-columns";
-import { useNewCompany } from "./-features/store/use-new-company";
 import { getCompaniesQueryOptions } from "./-features/queries/get-companies";
+import { useNewCompany } from "./-features/store/use-new-company";
 
 export const Route = createFileRoute("/_admin/admin/empresas/")({
   component: RouteComponent,

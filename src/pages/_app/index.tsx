@@ -47,8 +47,8 @@ function DashboardComponent() {
   return (
     <div className="flex-1 lg:ml-0">
       <div className="p-6 lg:p-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
+        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-lg border bg-white p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-medium text-gray-500">
@@ -59,7 +59,7 @@ function DashboardComponent() {
               <Building2 className="h-8 w-8 text-blue-500" />
             </div>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <div className="rounded-lg border bg-white p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-medium text-gray-500">
@@ -70,7 +70,7 @@ function DashboardComponent() {
               <User className="h-8 w-8 text-green-500" />
             </div>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <div className="rounded-lg border bg-white p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-medium text-gray-500">
@@ -81,7 +81,7 @@ function DashboardComponent() {
               <Users2 className="h-8 w-8 text-orange-500" />
             </div>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <div className="rounded-lg border bg-white p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-medium text-gray-500">Filiais</h3>
@@ -94,22 +94,22 @@ function DashboardComponent() {
 
         {/* Ações rápidas */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          <h2 className="mb-4 text-xl font-semibold text-gray-900">
             Ações Rápidas
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {quickActions.map((item) => (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {quickActions.map(item => (
               <Link key={item.title} to={item.url} className="group block">
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200 group-hover:border-gray-300">
+                <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow duration-200 group-hover:border-gray-300 hover:shadow-md">
                   <div className="flex items-center space-x-4">
-                    <div className={`${item.color} p-3 rounded-lg`}>
+                    <div className={`${item.color} rounded-lg p-3`}>
                       <item.icon className="h-6 w-6 text-white" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                      <h3 className="text-lg font-semibold text-gray-900 transition-colors group-hover:text-blue-600">
                         {item.title}
                       </h3>
-                      <p className="text-sm text-gray-600 mt-1">
+                      <p className="mt-1 text-sm text-gray-600">
                         {item.description}
                       </p>
                     </div>
@@ -121,33 +121,33 @@ function DashboardComponent() {
         </div>
 
         {/* Atividades recentes */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+        <div className="rounded-lg border bg-white p-6 shadow-sm">
+          <h2 className="mb-4 text-xl font-semibold text-gray-900">
             Atividades Recentes
           </h2>
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <div className="h-2 w-2 rounded-full bg-green-500"></div>
               <span className="text-sm text-gray-600">
                 Novo funcionário cadastrado - João Silva
               </span>
-              <span className="text-xs text-gray-400 ml-auto">2 min atrás</span>
+              <span className="ml-auto text-xs text-gray-400">2 min atrás</span>
             </div>
             <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <div className="h-2 w-2 rounded-full bg-blue-500"></div>
               <span className="text-sm text-gray-600">
                 Departamento "TI" atualizado
               </span>
-              <span className="text-xs text-gray-400 ml-auto">
+              <span className="ml-auto text-xs text-gray-400">
                 15 min atrás
               </span>
             </div>
             <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+              <div className="h-2 w-2 rounded-full bg-orange-500"></div>
               <span className="text-sm text-gray-600">
                 Nova filial criada - São Paulo
               </span>
-              <span className="text-xs text-gray-400 ml-auto">
+              <span className="ml-auto text-xs text-gray-400">
                 1 hora atrás
               </span>
             </div>

@@ -1,4 +1,3 @@
-import { Command, FileEdit, LayoutDashboard } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -10,6 +9,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Link, useLocation } from "@tanstack/react-router";
+import { Command, FileEdit, LayoutDashboard } from "lucide-react";
 
 const items = [
   {
@@ -26,7 +26,7 @@ const items = [
 
 export function AppSidebar() {
   const pathname = useLocation({
-    select: (location) => location.pathname,
+    select: location => location.pathname,
   });
 
   return (
@@ -52,7 +52,7 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel>Painel do cliente</SidebarGroupLabel>
           <SidebarMenu>
-            {items.map((item) => {
+            {items.map(item => {
               const isActive = pathname === item.url;
               return (
                 <SidebarMenuItem key={item.title}>

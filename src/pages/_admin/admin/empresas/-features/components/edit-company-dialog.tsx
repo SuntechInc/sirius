@@ -26,10 +26,10 @@ export function EditCompanyDialog() {
         "or.id": `eq:${id}`,
       },
       {
-        select: (data) => data.data[0],
+        select: data => data.data[0],
         enabled: !!id,
-      },
-    ),
+      }
+    )
   );
   const editCompanyMutation = useEditCompany();
 
@@ -46,7 +46,7 @@ export function EditCompanyDialog() {
           onSuccess: async () => {
             onClose();
           },
-        },
+        }
       );
     }
   }
@@ -86,7 +86,7 @@ export function EditCompanyDialog() {
         </DialogHeader>
         {isLoading ? (
           <div className="absolute inset-0 flex items-center justify-center">
-            <Loader2 className="size-4 animate-spin text-muted-foreground" />
+            <Loader2 className="text-muted-foreground size-4 animate-spin" />
           </div>
         ) : (
           <CompanyForm

@@ -22,8 +22,8 @@ const PasswordInput = React.forwardRef<HTMLInputElement, InputProps>(
           type="button"
           variant="ghost"
           size="sm"
-          className="absolute right-0 top-0 h-full px-3 py-1 hover:bg-transparent"
-          onClick={() => setShowPassword((prev) => !prev)}
+          className="absolute top-0 right-0 h-full px-3 py-1 hover:bg-transparent"
+          onClick={() => setShowPassword(prev => !prev)}
           disabled={props.value === "" || props.disabled}
         >
           {showPassword ? (
@@ -37,7 +37,7 @@ const PasswordInput = React.forwardRef<HTMLInputElement, InputProps>(
         </Button>
       </div>
     );
-  },
+  }
 );
 PasswordInput.displayName = "PasswordInput";
 

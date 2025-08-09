@@ -8,7 +8,7 @@ export function getProfileQueryOptions<TData = ResponseType, TError = Error>(
   options?: Omit<
     UseQueryOptions<ResponseType, TError, TData>,
     "queryFn" | "queryKey"
-  >,
+  >
 ) {
   return queryOptions({
     ...options,

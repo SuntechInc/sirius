@@ -1,4 +1,3 @@
-import { Building2, Command, LayoutDashboard, Network } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -11,6 +10,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Link } from "@tanstack/react-router";
+import { Building2, Command, LayoutDashboard, Network } from "lucide-react";
 
 const items = [
   { title: "Empresas", url: "/admin/empresas", icon: LayoutDashboard },
@@ -43,7 +43,7 @@ export function AdminSidebar() {
           <SidebarGroupLabel>Painel do administrador</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
+              {items.map(item => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <Link to={item.url}>

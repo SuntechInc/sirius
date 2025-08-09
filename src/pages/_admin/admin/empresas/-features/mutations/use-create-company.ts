@@ -8,13 +8,13 @@ export function useCreateCompany() {
 
   return useMutation({
     mutationFn: createCompany,
-    onSuccess: async (data) => {
+    onSuccess: async data => {
       await queryClient.invalidateQueries({
         queryKey: [getCompaniesQueryOptions().queryKey],
       });
       toast.success(`Empresa ${data.tradingName} criada com sucesso!`);
     },
-    onError: (err) => {
+    onError: err => {
       toast.error(err.message);
       console.error(err);
     },

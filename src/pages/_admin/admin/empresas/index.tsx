@@ -23,12 +23,12 @@ export const Route = createFileRoute("/_admin/admin/empresas/")({
 function RouteComponent() {
   const { data: companiesQuery } = useSuspenseQuery(getCompaniesQueryOptions());
 
-  const onOpen = useNewCompany((state) => state.onOpen);
+  const onOpen = useNewCompany(state => state.onOpen);
 
   return (
     <div className="flex-1 lg:ml-0">
       <div className="p-6 lg:p-8">
-        <div className="flex items-center justify-between mb-8">
+        <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Empresas</h1>
             <p className="text-gray-600">Gerencie as empresas do sistema</p>

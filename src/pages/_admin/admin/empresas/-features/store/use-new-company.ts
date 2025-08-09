@@ -6,7 +6,7 @@ type State = {
   onClose: () => void;
 };
 
-export const useNewCompany = create<State>((set) => ({
+export const useNewCompany = create<State>(set => ({
   isOpen: false,
   onOpen: () => set({ isOpen: true }),
   onClose: () => set({ isOpen: false }),

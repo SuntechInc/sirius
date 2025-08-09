@@ -16,12 +16,12 @@ type PromiseProps = {
 
 export function useConfirm(
   title: string,
-  message: string,
+  message: string
 ): [() => JSX.Element, () => Promise<unknown>] {
   const [promise, setPromise] = useState<PromiseProps>(null);
 
   function confirm() {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       setPromise({ resolve });
     });
   }

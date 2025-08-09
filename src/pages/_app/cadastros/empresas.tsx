@@ -23,12 +23,12 @@ export const Route = createFileRoute("/_app/cadastros/empresas")({
 function RouteComponent() {
   const { data: branchesQuery } = useSuspenseQuery(getBranchesQueryOptions());
 
-  const onOpen = useNewBranch((state) => state.onOpen);
+  const onOpen = useNewBranch(state => state.onOpen);
 
   return (
     <div className="flex-1 lg:ml-0">
       <div className="p-6 lg:p-8">
-        <div className="flex items-center justify-between mb-8">
+        <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Empresas e Filiais</h1>
             <p className="text-gray-600">

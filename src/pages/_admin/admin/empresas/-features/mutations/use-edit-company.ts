@@ -8,7 +8,7 @@ export function useEditCompany() {
 
   return useMutation({
     mutationFn: editCompany,
-    onSuccess: async (data) => {
+    onSuccess: async data => {
       await queryClient.invalidateQueries({
         queryKey: getCompaniesQueryOptions().queryKey,
       });
@@ -18,7 +18,7 @@ export function useEditCompany() {
       });
       toast.success(`Empresa ${data.tradingName} atualizada com sucesso!`);
     },
-    onError: (err) => {
+    onError: err => {
       toast.error(err.message);
       console.error(err);
     },

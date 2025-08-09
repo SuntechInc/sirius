@@ -7,7 +7,7 @@ type OpenBranchState = {
   onClose: () => void;
 };
 
-export const useOpenBranch = create<OpenBranchState>((set) => ({
+export const useOpenBranch = create<OpenBranchState>(set => ({
   id: undefined,
   isOpen: false,
   onOpen: (id: string) => set({ isOpen: true, id }),

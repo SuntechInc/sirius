@@ -41,7 +41,7 @@ function RouteComponent() {
   return (
     <div className="flex-1 lg:ml-0">
       <div className="p-6 lg:p-8">
-        <div className="flex items-center justify-between mb-8">
+        <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Cadastros</h1>
             <p className="text-gray-600">
@@ -50,28 +50,28 @@ function RouteComponent() {
           </div>
           <div className="flex gap-2">
             <div className="relative ml-auto flex-1 md:grow-0">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
               <Input
                 type="search"
                 placeholder="Buscar por..."
-                className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
+                className="bg-background w-full rounded-lg pl-8 md:w-[200px] lg:w-[336px]"
               />
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {cadastros.map((item) => (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {cadastros.map(item => (
             <Link key={item.title} to={item.url} className="group block">
-              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200 group-hover:border-gray-300">
+              <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow duration-200 group-hover:border-gray-300 hover:shadow-md">
                 <div className="flex items-center space-x-4">
-                  <div className={`${item.color} p-3 rounded-lg`}>
+                  <div className={`${item.color} rounded-lg p-3`}>
                     <item.icon className="h-6 w-6 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                    <h3 className="text-lg font-semibold text-gray-900 transition-colors group-hover:text-blue-600">
                       {item.title}
                     </h3>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="mt-1 text-sm text-gray-600">
                       {item.description}
                     </p>
                   </div>

@@ -7,7 +7,7 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use(
-  (config) => {
+  config => {
     const { accessToken } = getAuthTokens();
 
     const isLoginRoute = config.url?.includes("/auth/login");
@@ -18,7 +18,7 @@ api.interceptors.request.use(
 
     return config;
   },
-  (error) => {
+  error => {
     return Promise.reject(error);
-  },
+  }
 );

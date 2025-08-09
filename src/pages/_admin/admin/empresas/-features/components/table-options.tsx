@@ -15,7 +15,7 @@ type ActionsProps = {
 };
 
 export function Actions({ id }: ActionsProps) {
-  const onOpen = useOpenCompany((state) => state.onOpen);
+  const onOpen = useOpenCompany(state => state.onOpen);
 
   return (
     <DropdownMenu>

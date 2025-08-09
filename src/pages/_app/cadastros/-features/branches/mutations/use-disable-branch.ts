@@ -8,13 +8,13 @@ export function useDisableBranch() {
 
   return useMutation({
     mutationFn: disableBranch,
-    onSuccess: async (data) => {
+    onSuccess: async data => {
       await queryClient.invalidateQueries({
         queryKey: getBranchesQueryOptions().queryKey,
       });
       toast.success(`Empresa ${data.tradingName} desativada com sucesso!`);
     },
-    onError: (err) => {
+    onError: err => {
       toast.error(err.message);
       console.error(err);
     },

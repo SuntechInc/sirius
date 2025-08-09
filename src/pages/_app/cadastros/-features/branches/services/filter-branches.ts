@@ -44,7 +44,7 @@ export async function filterBranches(filters: FilterParams = {}) {
     "/branches/filter",
     {
       params,
-    },
+    }
   );
 
   return data;

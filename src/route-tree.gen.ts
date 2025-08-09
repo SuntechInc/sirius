@@ -8,249 +8,249 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './pages/__root'
-import { Route as AppLayoutRouteImport } from './pages/_app/layout'
-import { Route as AppIndexRouteImport } from './pages/_app/index'
-import { Route as PublicTermosRouteImport } from './pages/_public/termos'
-import { Route as PublicPrivacidadeRouteImport } from './pages/_public/privacidade'
-import { Route as AuthLoginRouteImport } from './pages/_auth/login'
-import { Route as AdminAdminLayoutRouteImport } from './pages/_admin/admin/layout'
-import { Route as AppCadastrosIndexRouteImport } from './pages/_app/cadastros/index'
-import { Route as AdminAdminIndexRouteImport } from './pages/_admin/admin/index'
-import { Route as AppCadastrosEmpresasRouteImport } from './pages/_app/cadastros/empresas'
-import { Route as AdminAdminEmpresasIndexRouteImport } from './pages/_admin/admin/empresas/index'
+import { Route as rootRouteImport } from "./pages/__root";
+import { Route as AppLayoutRouteImport } from "./pages/_app/layout";
+import { Route as AppIndexRouteImport } from "./pages/_app/index";
+import { Route as PublicTermosRouteImport } from "./pages/_public/termos";
+import { Route as PublicPrivacidadeRouteImport } from "./pages/_public/privacidade";
+import { Route as AuthLoginRouteImport } from "./pages/_auth/login";
+import { Route as AdminAdminLayoutRouteImport } from "./pages/_admin/admin/layout";
+import { Route as AppCadastrosIndexRouteImport } from "./pages/_app/cadastros/index";
+import { Route as AdminAdminIndexRouteImport } from "./pages/_admin/admin/index";
+import { Route as AppCadastrosEmpresasRouteImport } from "./pages/_app/cadastros/empresas";
+import { Route as AdminAdminEmpresasIndexRouteImport } from "./pages/_admin/admin/empresas/index";
 
 const AppLayoutRoute = AppLayoutRouteImport.update({
-  id: '/_app',
+  id: "/_app",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const AppIndexRoute = AppIndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => AppLayoutRoute,
-} as any)
+} as any);
 const PublicTermosRoute = PublicTermosRouteImport.update({
-  id: '/_public/termos',
-  path: '/termos',
+  id: "/_public/termos",
+  path: "/termos",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const PublicPrivacidadeRoute = PublicPrivacidadeRouteImport.update({
-  id: '/_public/privacidade',
-  path: '/privacidade',
+  id: "/_public/privacidade",
+  path: "/privacidade",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const AuthLoginRoute = AuthLoginRouteImport.update({
-  id: '/_auth/login',
-  path: '/login',
+  id: "/_auth/login",
+  path: "/login",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const AdminAdminLayoutRoute = AdminAdminLayoutRouteImport.update({
-  id: '/_admin/admin',
-  path: '/admin',
+  id: "/_admin/admin",
+  path: "/admin",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const AppCadastrosIndexRoute = AppCadastrosIndexRouteImport.update({
-  id: '/cadastros/',
-  path: '/cadastros/',
+  id: "/cadastros/",
+  path: "/cadastros/",
   getParentRoute: () => AppLayoutRoute,
-} as any)
+} as any);
 const AdminAdminIndexRoute = AdminAdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => AdminAdminLayoutRoute,
-} as any)
+} as any);
 const AppCadastrosEmpresasRoute = AppCadastrosEmpresasRouteImport.update({
-  id: '/cadastros/empresas',
-  path: '/cadastros/empresas',
+  id: "/cadastros/empresas",
+  path: "/cadastros/empresas",
   getParentRoute: () => AppLayoutRoute,
-} as any)
+} as any);
 const AdminAdminEmpresasIndexRoute = AdminAdminEmpresasIndexRouteImport.update({
-  id: '/empresas/',
-  path: '/empresas/',
+  id: "/empresas/",
+  path: "/empresas/",
   getParentRoute: () => AdminAdminLayoutRoute,
-} as any)
+} as any);
 
 export interface FileRoutesByFullPath {
-  '/admin': typeof AdminAdminLayoutRouteWithChildren
-  '/login': typeof AuthLoginRoute
-  '/privacidade': typeof PublicPrivacidadeRoute
-  '/termos': typeof PublicTermosRoute
-  '/': typeof AppIndexRoute
-  '/cadastros/empresas': typeof AppCadastrosEmpresasRoute
-  '/admin/': typeof AdminAdminIndexRoute
-  '/cadastros': typeof AppCadastrosIndexRoute
-  '/admin/empresas': typeof AdminAdminEmpresasIndexRoute
+  "/admin": typeof AdminAdminLayoutRouteWithChildren;
+  "/login": typeof AuthLoginRoute;
+  "/privacidade": typeof PublicPrivacidadeRoute;
+  "/termos": typeof PublicTermosRoute;
+  "/": typeof AppIndexRoute;
+  "/cadastros/empresas": typeof AppCadastrosEmpresasRoute;
+  "/admin/": typeof AdminAdminIndexRoute;
+  "/cadastros": typeof AppCadastrosIndexRoute;
+  "/admin/empresas": typeof AdminAdminEmpresasIndexRoute;
 }
 export interface FileRoutesByTo {
-  '/login': typeof AuthLoginRoute
-  '/privacidade': typeof PublicPrivacidadeRoute
-  '/termos': typeof PublicTermosRoute
-  '/': typeof AppIndexRoute
-  '/cadastros/empresas': typeof AppCadastrosEmpresasRoute
-  '/admin': typeof AdminAdminIndexRoute
-  '/cadastros': typeof AppCadastrosIndexRoute
-  '/admin/empresas': typeof AdminAdminEmpresasIndexRoute
+  "/login": typeof AuthLoginRoute;
+  "/privacidade": typeof PublicPrivacidadeRoute;
+  "/termos": typeof PublicTermosRoute;
+  "/": typeof AppIndexRoute;
+  "/cadastros/empresas": typeof AppCadastrosEmpresasRoute;
+  "/admin": typeof AdminAdminIndexRoute;
+  "/cadastros": typeof AppCadastrosIndexRoute;
+  "/admin/empresas": typeof AdminAdminEmpresasIndexRoute;
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/_app': typeof AppLayoutRouteWithChildren
-  '/_admin/admin': typeof AdminAdminLayoutRouteWithChildren
-  '/_auth/login': typeof AuthLoginRoute
-  '/_public/privacidade': typeof PublicPrivacidadeRoute
-  '/_public/termos': typeof PublicTermosRoute
-  '/_app/': typeof AppIndexRoute
-  '/_app/cadastros/empresas': typeof AppCadastrosEmpresasRoute
-  '/_admin/admin/': typeof AdminAdminIndexRoute
-  '/_app/cadastros/': typeof AppCadastrosIndexRoute
-  '/_admin/admin/empresas/': typeof AdminAdminEmpresasIndexRoute
+  __root__: typeof rootRouteImport;
+  "/_app": typeof AppLayoutRouteWithChildren;
+  "/_admin/admin": typeof AdminAdminLayoutRouteWithChildren;
+  "/_auth/login": typeof AuthLoginRoute;
+  "/_public/privacidade": typeof PublicPrivacidadeRoute;
+  "/_public/termos": typeof PublicTermosRoute;
+  "/_app/": typeof AppIndexRoute;
+  "/_app/cadastros/empresas": typeof AppCadastrosEmpresasRoute;
+  "/_admin/admin/": typeof AdminAdminIndexRoute;
+  "/_app/cadastros/": typeof AppCadastrosIndexRoute;
+  "/_admin/admin/empresas/": typeof AdminAdminEmpresasIndexRoute;
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
+  fileRoutesByFullPath: FileRoutesByFullPath;
   fullPaths:
-    | '/admin'
-    | '/login'
-    | '/privacidade'
-    | '/termos'
-    | '/'
-    | '/cadastros/empresas'
-    | '/admin/'
-    | '/cadastros'
-    | '/admin/empresas'
-  fileRoutesByTo: FileRoutesByTo
+    | "/admin"
+    | "/login"
+    | "/privacidade"
+    | "/termos"
+    | "/"
+    | "/cadastros/empresas"
+    | "/admin/"
+    | "/cadastros"
+    | "/admin/empresas";
+  fileRoutesByTo: FileRoutesByTo;
   to:
-    | '/login'
-    | '/privacidade'
-    | '/termos'
-    | '/'
-    | '/cadastros/empresas'
-    | '/admin'
-    | '/cadastros'
-    | '/admin/empresas'
+    | "/login"
+    | "/privacidade"
+    | "/termos"
+    | "/"
+    | "/cadastros/empresas"
+    | "/admin"
+    | "/cadastros"
+    | "/admin/empresas";
   id:
-    | '__root__'
-    | '/_app'
-    | '/_admin/admin'
-    | '/_auth/login'
-    | '/_public/privacidade'
-    | '/_public/termos'
-    | '/_app/'
-    | '/_app/cadastros/empresas'
-    | '/_admin/admin/'
-    | '/_app/cadastros/'
-    | '/_admin/admin/empresas/'
-  fileRoutesById: FileRoutesById
+    | "__root__"
+    | "/_app"
+    | "/_admin/admin"
+    | "/_auth/login"
+    | "/_public/privacidade"
+    | "/_public/termos"
+    | "/_app/"
+    | "/_app/cadastros/empresas"
+    | "/_admin/admin/"
+    | "/_app/cadastros/"
+    | "/_admin/admin/empresas/";
+  fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  AppLayoutRoute: typeof AppLayoutRouteWithChildren
-  AdminAdminLayoutRoute: typeof AdminAdminLayoutRouteWithChildren
-  AuthLoginRoute: typeof AuthLoginRoute
-  PublicPrivacidadeRoute: typeof PublicPrivacidadeRoute
-  PublicTermosRoute: typeof PublicTermosRoute
+  AppLayoutRoute: typeof AppLayoutRouteWithChildren;
+  AdminAdminLayoutRoute: typeof AdminAdminLayoutRouteWithChildren;
+  AuthLoginRoute: typeof AuthLoginRoute;
+  PublicPrivacidadeRoute: typeof PublicPrivacidadeRoute;
+  PublicTermosRoute: typeof PublicTermosRoute;
 }
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    '/_app': {
-      id: '/_app'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof AppLayoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_app/': {
-      id: '/_app/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof AppIndexRouteImport
-      parentRoute: typeof AppLayoutRoute
-    }
-    '/_public/termos': {
-      id: '/_public/termos'
-      path: '/termos'
-      fullPath: '/termos'
-      preLoaderRoute: typeof PublicTermosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_public/privacidade': {
-      id: '/_public/privacidade'
-      path: '/privacidade'
-      fullPath: '/privacidade'
-      preLoaderRoute: typeof PublicPrivacidadeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_auth/login': {
-      id: '/_auth/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof AuthLoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_admin/admin': {
-      id: '/_admin/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminAdminLayoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_app/cadastros/': {
-      id: '/_app/cadastros/'
-      path: '/cadastros'
-      fullPath: '/cadastros'
-      preLoaderRoute: typeof AppCadastrosIndexRouteImport
-      parentRoute: typeof AppLayoutRoute
-    }
-    '/_admin/admin/': {
-      id: '/_admin/admin/'
-      path: '/'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AdminAdminIndexRouteImport
-      parentRoute: typeof AdminAdminLayoutRoute
-    }
-    '/_app/cadastros/empresas': {
-      id: '/_app/cadastros/empresas'
-      path: '/cadastros/empresas'
-      fullPath: '/cadastros/empresas'
-      preLoaderRoute: typeof AppCadastrosEmpresasRouteImport
-      parentRoute: typeof AppLayoutRoute
-    }
-    '/_admin/admin/empresas/': {
-      id: '/_admin/admin/empresas/'
-      path: '/empresas'
-      fullPath: '/admin/empresas'
-      preLoaderRoute: typeof AdminAdminEmpresasIndexRouteImport
-      parentRoute: typeof AdminAdminLayoutRoute
-    }
+    "/_app": {
+      id: "/_app";
+      path: "";
+      fullPath: "";
+      preLoaderRoute: typeof AppLayoutRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/_app/": {
+      id: "/_app/";
+      path: "/";
+      fullPath: "/";
+      preLoaderRoute: typeof AppIndexRouteImport;
+      parentRoute: typeof AppLayoutRoute;
+    };
+    "/_public/termos": {
+      id: "/_public/termos";
+      path: "/termos";
+      fullPath: "/termos";
+      preLoaderRoute: typeof PublicTermosRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/_public/privacidade": {
+      id: "/_public/privacidade";
+      path: "/privacidade";
+      fullPath: "/privacidade";
+      preLoaderRoute: typeof PublicPrivacidadeRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/_auth/login": {
+      id: "/_auth/login";
+      path: "/login";
+      fullPath: "/login";
+      preLoaderRoute: typeof AuthLoginRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/_admin/admin": {
+      id: "/_admin/admin";
+      path: "/admin";
+      fullPath: "/admin";
+      preLoaderRoute: typeof AdminAdminLayoutRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/_app/cadastros/": {
+      id: "/_app/cadastros/";
+      path: "/cadastros";
+      fullPath: "/cadastros";
+      preLoaderRoute: typeof AppCadastrosIndexRouteImport;
+      parentRoute: typeof AppLayoutRoute;
+    };
+    "/_admin/admin/": {
+      id: "/_admin/admin/";
+      path: "/";
+      fullPath: "/admin/";
+      preLoaderRoute: typeof AdminAdminIndexRouteImport;
+      parentRoute: typeof AdminAdminLayoutRoute;
+    };
+    "/_app/cadastros/empresas": {
+      id: "/_app/cadastros/empresas";
+      path: "/cadastros/empresas";
+      fullPath: "/cadastros/empresas";
+      preLoaderRoute: typeof AppCadastrosEmpresasRouteImport;
+      parentRoute: typeof AppLayoutRoute;
+    };
+    "/_admin/admin/empresas/": {
+      id: "/_admin/admin/empresas/";
+      path: "/empresas";
+      fullPath: "/admin/empresas";
+      preLoaderRoute: typeof AdminAdminEmpresasIndexRouteImport;
+      parentRoute: typeof AdminAdminLayoutRoute;
+    };
   }
 }
 
 interface AppLayoutRouteChildren {
-  AppIndexRoute: typeof AppIndexRoute
-  AppCadastrosEmpresasRoute: typeof AppCadastrosEmpresasRoute
-  AppCadastrosIndexRoute: typeof AppCadastrosIndexRoute
+  AppIndexRoute: typeof AppIndexRoute;
+  AppCadastrosEmpresasRoute: typeof AppCadastrosEmpresasRoute;
+  AppCadastrosIndexRoute: typeof AppCadastrosIndexRoute;
 }
 
 const AppLayoutRouteChildren: AppLayoutRouteChildren = {
   AppIndexRoute: AppIndexRoute,
   AppCadastrosEmpresasRoute: AppCadastrosEmpresasRoute,
   AppCadastrosIndexRoute: AppCadastrosIndexRoute,
-}
+};
 
 const AppLayoutRouteWithChildren = AppLayoutRoute._addFileChildren(
-  AppLayoutRouteChildren,
-)
+  AppLayoutRouteChildren
+);
 
 interface AdminAdminLayoutRouteChildren {
-  AdminAdminIndexRoute: typeof AdminAdminIndexRoute
-  AdminAdminEmpresasIndexRoute: typeof AdminAdminEmpresasIndexRoute
+  AdminAdminIndexRoute: typeof AdminAdminIndexRoute;
+  AdminAdminEmpresasIndexRoute: typeof AdminAdminEmpresasIndexRoute;
 }
 
 const AdminAdminLayoutRouteChildren: AdminAdminLayoutRouteChildren = {
   AdminAdminIndexRoute: AdminAdminIndexRoute,
   AdminAdminEmpresasIndexRoute: AdminAdminEmpresasIndexRoute,
-}
+};
 
 const AdminAdminLayoutRouteWithChildren =
-  AdminAdminLayoutRoute._addFileChildren(AdminAdminLayoutRouteChildren)
+  AdminAdminLayoutRoute._addFileChildren(AdminAdminLayoutRouteChildren);
 
 const rootRouteChildren: RootRouteChildren = {
   AppLayoutRoute: AppLayoutRouteWithChildren,
@@ -258,7 +258,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthLoginRoute: AuthLoginRoute,
   PublicPrivacidadeRoute: PublicPrivacidadeRoute,
   PublicTermosRoute: PublicTermosRoute,
-}
+};
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+  ._addFileTypes<FileRouteTypes>();

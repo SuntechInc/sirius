@@ -30,6 +30,12 @@ api.interceptors.response.use(
   async error => {
     const originalRequest = error.config;
 
+    // Para rotas de login, não tentar refresh token
+    const isLoginRoute = originalRequest.url?.includes("/auth/login");
+    if (isLoginRoute) {
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
@@ -43,12 +49,13 @@ api.interceptors.response.use(
           return api(originalRequest);
         }
 
-        // If no refresh token, clear tokens and redirect to login
+        // Se não há refresh token, apenas limpar os tokens
+        // O redirecionamento será tratado pelo componente
         clearAuthTokens();
-        window.location.href = "/login";
       } catch {
+        // Se o refresh falhar, apenas limpar os tokens
+        // O redirecionamento será tratado pelo componente
         clearAuthTokens();
-        window.location.href = "/login";
       }
     }
 

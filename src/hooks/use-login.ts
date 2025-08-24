@@ -14,10 +14,11 @@ type RequestType = {
 
 export function useLoginMutation() {
   return useMutation<ResponseType, AxiosError, RequestType>({
-    mutationFn: async json => {
+    mutationFn: async (json) => {
       const res = await api.post<ResponseType>("/auth/login", json);
-
       return res.data;
     },
+    retry: false,
+    retryOnMount: false,
   });
 }

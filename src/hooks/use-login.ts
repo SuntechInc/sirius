@@ -19,6 +19,5 @@ export function useLoginMutation() {
       return res.data;
     },
     retry: false,
-    retryOnMount: false,
   });
 }
